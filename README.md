@@ -1,2 +1,1 @@
 # ThalaApp
-Hello World
