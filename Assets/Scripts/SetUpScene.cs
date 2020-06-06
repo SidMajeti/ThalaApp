@@ -10,6 +10,7 @@ public class SetUpScene : MonoBehaviour
     {
         //ensures time scale is appropriate
         Time.timeScale = 1.0f;
+
     }
 
     // Update is called once per frame

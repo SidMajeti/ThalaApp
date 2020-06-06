@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+//changes animation speed
+//updates inputField with speed and stops audio when necessary
 public class AdjustSpeed : MonoBehaviour
 {
     public TMP_InputField inputField;
@@ -52,9 +54,9 @@ public class AdjustSpeed : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
+    // if people are typing in InputField, then stop audio
     void Update()
     {   
-        
+       
     }
 }
