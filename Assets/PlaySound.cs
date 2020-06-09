@@ -18,8 +18,14 @@ public class PlaySound : StateMachineBehaviour
         inputField = animator.GetComponent<AdjustSpeed>().inputField;
         secperBeat = 60/(float.Parse(inputField.text));
         float lengthOfAudio = audioSource.clip.length;
-        jc = animator.GetComponent<InstatiateGlobalVars>().GetPluginJavaClass();
-        jc.CallStatic("audioPlayer", lengthOfAudio / secperBeat);
+        #if UNITY_ANDROID
+            jc = animator.GetComponent<InstatiateGlobalVars>().GetPluginJavaClass();
+            jc.CallStatic("audioPlayer", lengthOfAudio / secperBeat);
+        #endif
+        #if UNITY_IOS
+
+        #endif
+
     }
 
 

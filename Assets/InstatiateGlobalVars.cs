@@ -11,10 +11,12 @@ public class InstatiateGlobalVars : MonoBehaviour
     AndroidJavaClass jc;
     void Start()
     {
-        javaClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-        javaObject = javaClass.GetStatic<AndroidJavaObject>("currentActivity");
-        jc = new AndroidJavaClass("com.thalaapp.unityplugin.PlayAudio");
-        jc.CallStatic("instantiateMp", javaObject, "tap.wav");
+        #if UNITY_ANDROID
+            javaClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+            javaObject = javaClass.GetStatic<AndroidJavaObject>("currentActivity");
+            jc = new AndroidJavaClass("com.thalaapp.unityplugin.PlayAudio");
+            jc.CallStatic("instantiateMp", javaObject, "tap.wav");
+        #endif
     }
 
     public AndroidJavaClass GetUnityJavaClass()
