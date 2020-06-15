@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEditor;
+using UnityEngine.SceneManagement;
 
 public class AnimFuncs : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class AnimFuncs : MonoBehaviour
     public Button stop,start;
     public Dropdown dropdown;
     AnimatorControllerParameter[] parameters;
+    public Canvas canvas;
 
     // Start is called before the first frame update
     void Start()
@@ -37,10 +39,16 @@ public class AnimFuncs : MonoBehaviour
         }
         else if(EventSystem.current.currentSelectedGameObject.name == "PlayButton")
         {
+            //canvas.GetComponent<FadeUIElems>().Hide();
             m_Animator.SetBool("StopAnim", false);
             int val = dropdown.value;
             m_Animator.SetBool(parameters[val].name, true);
         }
+    }
+
+    void Update()
+    {
+        
     }
 
 }

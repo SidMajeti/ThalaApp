@@ -13,10 +13,14 @@ public class AdjustSpeed : MonoBehaviour
     public TMP_InputField inputField;
     public Button incrSpeed;
     public Button decrSpeed;
+    public Button exitPopUp;
     const int framesPerBeat = 20;
     const int framesPerSecond = 24;
     Animator m_Animator;
     double beats;
+    public Canvas popUpError;
+    public Canvas mainCanvas;
+    AnimatorControllerParameter[] parameters;
 
     // Start is called before the first frame update
     void Start()
@@ -28,14 +32,33 @@ public class AdjustSpeed : MonoBehaviour
         incrSpeed.onClick.AddListener(TaskOnClick);
         decrSpeed.onClick.AddListener(TaskOnClick);
         inputField.onEndEdit.AddListener(ChangeSpeed);
-        inputField.text = Convert.ToString((int)(m_Animator.speed* 60 * framesPerSecond / framesPerBeat));
+        inputField.text = Convert.ToString((int)(m_Animator.speed * 60 * framesPerSecond / framesPerBeat)); ;
+        exitPopUp.onClick.AddListener(ExitPopUp);
+        parameters = m_Animator.parameters;
+    }
+
+    void ExitPopUp()
+    {
+        popUpError.enabled = false;
+        mainCanvas.GetComponent<CanvasGroup>().interactable = true;
+        inputField.ActivateInputField();
     }
 
     void ChangeSpeed(String val)
     {
-        beats = float.Parse(val);
-        float animSpeed = (float)(beats * framesPerBeat / (60 * framesPerSecond));
-        m_Animator.speed = animSpeed;
+        bool isNumeric = double.TryParse(val, out beats);
+        if (!isNumeric)
+        {
+            popUpError.enabled = true;
+            mainCanvas.GetComponent<CanvasGroup>().interactable = false;
+            popUpError.GetComponent<CanvasGroup>().interactable = true;
+        }
+        else
+        {
+            float animSpeed = (float)(beats * framesPerBeat / (60 * framesPerSecond));
+            m_Animator.speed = animSpeed;
+            m_Animator.SetBool("StopAnim", false);
+        }
     }
 
     void TaskOnClick()
@@ -56,7 +79,10 @@ public class AdjustSpeed : MonoBehaviour
 
     // if people are typing in InputField, then stop audio
     void Update()
-    {   
-       
+    {
+        if (inputField.isFocused)
+        {
+            m_Animator.SetBool("StopAnim", true);
+        }
     }
 }
