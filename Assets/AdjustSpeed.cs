@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -10,6 +11,12 @@ using UnityEngine.UI;
 //updates inputField with speed and stops audio when necessary
 public class AdjustSpeed : MonoBehaviour
 {
+#if UNITY_IOS
+    //[DllImport("__Internal")]
+    //private static extern void IOSChangeSpeed(float speed);
+    [DllImport("__Internal")]
+    private static extern void IOSStopSound();
+#endif
     public TMP_InputField inputField;
     public Button incrSpeed;
     public Button decrSpeed;
@@ -21,6 +28,7 @@ public class AdjustSpeed : MonoBehaviour
     public Canvas popUpError;
     public Canvas mainCanvas;
     AnimatorControllerParameter[] parameters;
+    AudioSource audioSource;
 
     // Start is called before the first frame update
     void Start()
@@ -35,6 +43,12 @@ public class AdjustSpeed : MonoBehaviour
         inputField.text = Convert.ToString((int)(m_Animator.speed * 60 * framesPerSecond / framesPerBeat)); ;
         exitPopUp.onClick.AddListener(ExitPopUp);
         parameters = m_Animator.parameters;
+        audioSource = m_Animator.GetComponent<AudioSource>();
+//#if UNITY_IOS
+//        float lengthOfAudio = audioSource.clip.length;
+//        float secperBeat = 60 / (float.Parse(inputField.text));
+//        IOSChangeSpeed(lengthOfAudio / secperBeat);
+//#endif
     }
 
     void ExitPopUp()
