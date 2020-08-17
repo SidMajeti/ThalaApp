@@ -1,14 +1,11 @@
-#import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
 #import <AudioToolbox/AudioToolbox.h>
 
-@interface SoundPlayer : NSObject
+@interface SoundPlayer:NSObject
 {
-    AVPlayer *player;
-    AVAudioSession *session;
-    AVQueuePlayer *queuePlayer;
-    NSURL *soundFileURL;
-    AVPlayerItem *lastitem;
+    AVAudioPlayerNode *audioPlayerNode;
+    AVAudioFile *audioFileMainClick;
+    AVAudioEngine *audioEngine;
 }
 @end
 
@@ -16,6 +13,8 @@
 @implementation SoundPlayer
 
 static SoundPlayer *_sharedInstance;
+double firstime = 0;
+float currSpeed = 0.0f;
 
 +(SoundPlayer*) sharedInstance
 {
@@ -32,54 +31,101 @@ static SoundPlayer *_sharedInstance;
     return self;
 }
 
--(void)playerDidFinishPlaying:(NSNotification*) notification{
-    queuePlayer.actionAtItemEnd = AVPlayerActionAtItemEndNone;
-    AVPlayerItem *playerItem = [[AVPlayerItem alloc] initWithURL:soundFileURL];
-    playerItem.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithmSpectral;
-    [queuePlayer insertItem:playerItem afterItem:lastitem];
-    NSLog(@"QueuePlayerItem added");
-    lastitem = playerItem;
-}
 
 -(void)initSoundPlayer:(NSString*) soundFilePath
 {
-    soundFileURL = [NSURL fileURLWithPath:soundFilePath];
-    session = [AVAudioSession sharedInstance];
-    [session setCategory:AVAudioSessionCategoryPlayback error:nil];
-    queuePlayer = [[AVQueuePlayer alloc] init];
-    queuePlayer.actionAtItemEnd = AVPlayerActionAtItemEndNone;
-    lastitem = nil;
-    for(int i = 0; i< 100; i++){
-        AVPlayerItem *playerItem = [[AVPlayerItem alloc] initWithURL:soundFileURL];
-        playerItem.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithmSpectral;
-        [queuePlayer insertItem:playerItem afterItem:lastitem];
-        lastitem = playerItem;
+    [[AVAudioSession sharedInstance]
+    setCategory: AVAudioSessionCategoryPlayback
+          error: nil];
+    
+    NSURL *soundFileURL = [NSURL fileURLWithPath:soundFilePath];
+    audioFileMainClick = [[AVAudioFile alloc] initForReading:soundFileURL error:nil];
+            
+    
+    audioPlayerNode = [[AVAudioPlayerNode alloc] init];
+    
+    audioEngine = [[AVAudioEngine alloc] init];
+    [audioEngine attachNode:audioPlayerNode];
+    
+    [audioEngine connect:audioPlayerNode to:[audioEngine mainMixerNode] format:[audioFileMainClick processingFormat]];
+    
+    [audioEngine prepare];
+    
+    [audioEngine startAndReturnError:nil];
+}
+
+-(AVAudioPCMBuffer*)generateBuffer:(float) bpm{
+    NSError *error = nil;
+    [audioFileMainClick setFramePosition:0];
+    
+    int beatLength = AVAudioFrameCount(audioFileMainClick.processingFormat.sampleRate * 60 / bpm);
+    AVAudioPCMBuffer *buffermainclick = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audioFileMainClick.processingFormat frameCapacity:beatLength];
+    
+    [audioFileMainClick readIntoBuffer:buffermainclick error:&error];
+    [buffermainclick setFrameLength:beatLength];
+    
+    return buffermainclick;
+}
+//very slight lag
+//prevent user from going over a certain speed: 200?
+-(void)playSound:(float) speed :(NSString*) tag{
+    currSpeed = speed;
+    if(speed > 100.0f){
+        speed -= 2.0* (speed - 100)/ 100.0;
     }
-//    [[NSNotificationCenter defaultCenter] addObserver:self selector: @selector(playerDidFinishPlaying:) name:AVPlayerItemDidPlayToEndTimeNotification object:nil];
-}
-
-//some reason plays multiple times on load
--(void)playSound:(float) speed{
-    [queuePlayer play];
-    [queuePlayer advanceToNextItem];
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0ul), ^{
-        AVPlayerItem *playerItem = [[AVPlayerItem alloc] initWithURL:soundFileURL];
-        playerItem.audioTimePitchAlgorithm = AVAudioTimePitchAlgorithmSpectral;
-        [queuePlayer insertItem:playerItem afterItem:lastitem];
-        lastitem = playerItem;
+    
+    dispatch_time_t delay;
+    if([tag isEqualToString:@"MisraTag"]){
+        NSLog(@"Tag worked");
+        delay = dispatch_time(DISPATCH_TIME_NOW, 0);
+    }
+    else if (speed > 66.0f){
+        delay = dispatch_time(DISPATCH_TIME_NOW, 0.5*pow((72.0/speed), 2)*NSEC_PER_SEC);
+    }
+    else{
+        delay = dispatch_time(DISPATCH_TIME_NOW, 0.5*(72.0/speed)*NSEC_PER_SEC);
+    }
+    dispatch_after(delay, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        AVAudioPCMBuffer *buffer = [_sharedInstance generateBuffer:speed];
+        if(audioEngine.isRunning){
+//            NSLog(@"Audio Engine is running");
+            if ([audioPlayerNode isPlaying]) {
+//                NSLog(@"Audio is playing");
+                [audioPlayerNode stop];
+                [audioPlayerNode play];
+                [audioPlayerNode scheduleBuffer:buffer atTime:nil options:AVAudioPlayerNodeBufferInterrupts completionHandler:nil];
+            } else {
+//                NSLog(@"Audio is playing");
+//                NSLog(@"Speed is %f", speed);
+                [audioPlayerNode play];
+                [audioPlayerNode scheduleBuffer:buffer atTime:nil options:AVAudioPlayerNodeBufferLoops completionHandler:nil];
+            }
+        }
     });
+    
 }
 
+-(bool)isPlaying{
+    return [audioPlayerNode isPlaying];
+}
 -(void)stopSound{
-    [queuePlayer pause];
+    if([audioEngine isRunning]){
+        [audioPlayerNode stop];
+//        NSLog(@"AudioPlayer is stopped");
+    }
+        
 }
 
--(void)muteSound{
-    [queuePlayer setMuted:true];
+-(float)getSpeed{
+    return currSpeed;
 }
 
--(void)unMuteSound{
-    [queuePlayer setMuted:false];
+-(void) unmuteSound{
+    [audioEngine startAndReturnError:nil];
+}
+
+-(void) muteSound{
+    [audioEngine pause];
 }
 
 //-(bool)isPlaying{
@@ -100,22 +146,26 @@ extern "C"
 //    void IOSChangeSpeed(float speed){
 //        [[SoundPlayer sharedInstance] changeSpeed:speed];
 //    }
-    void IOSStopSound(){
-        [[SoundPlayer sharedInstance] stopSound];
-    }
-    void IOSPlaySound(float speed){
-        [[SoundPlayer sharedInstance] playSound:speed];
-    }
     void IOSMuteSound(){
         [[SoundPlayer sharedInstance] muteSound];
     }
     void IOSUnMuteSound(){
-        [[SoundPlayer sharedInstance] unMuteSound];
+        [[SoundPlayer sharedInstance] unmuteSound];
     }
-//    bool IOSIsPlaying(){
-//        return [[SoundPlayer sharedInstance] isPlaying];
-//    }
+    void IOSStopSound(){
+        [[SoundPlayer sharedInstance] stopSound];
+    }
+    void IOSPlaySound(float speed, char* tag){
+        [[SoundPlayer sharedInstance] playSound:speed :[NSString stringWithUTF8String:tag]];
+    }
+    bool IOSIsPlaying(){
+        return [[SoundPlayer sharedInstance] isPlaying];
+    }
+    float IOSGetSpeed(){
+        return [[SoundPlayer sharedInstance] getSpeed];
+    }
 //    void SeekTo(){
 //        [[SoundPlayer sharedInstance] seekTo];
 //    }
 }
+

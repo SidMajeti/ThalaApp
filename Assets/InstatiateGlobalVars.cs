@@ -15,19 +15,27 @@ public class InstatiateGlobalVars : MonoBehaviour
     AndroidJavaClass javaClass;
     AndroidJavaObject javaObject;
     AndroidJavaClass jc;
+    AndroidJavaObject jcInstance;
 #endif
     void Start()
     {
-#if UNITY_ANDROID
-                    javaClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-                    javaObject = javaClass.GetStatic<AndroidJavaObject>("currentActivity");
-                    jc = new AndroidJavaClass("com.thalaapp.unityplugin.PlayAudio");
-                    jc.CallStatic("instantiateMp", javaObject, "tap.wav");
-#endif
-#if UNITY_IOS
-            string StreamingAssetsBundlesFolder = Path.Combine(Application.streamingAssetsPath, "tap.wav");
+        #if UNITY_ANDROID
+            javaClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+            javaObject = javaClass.GetStatic<AndroidJavaObject>("currentActivity");
+            jc = new AndroidJavaClass("com.thalaapp.unityplugin.Metronome");
+            jcInstance = jc.CallStatic<AndroidJavaObject>("getInstance");
+            jcInstance.Call("initMetroTask", jcInstance);
+            //Debug.Log("instantiated class properly");
+            jcInstance.Call("setBeatSound", 2440.0);
+            //Debug.Log("Beat sound: " + bs);
+            //Debug.Log("called beat sound method");
+            jcInstance.Call("setSound", 6440.0);
+            jcInstance.Call("setBeat", 8);
+        #endif
+        #if UNITY_IOS
+            string StreamingAssetsBundlesFolder = Path.Combine(Application.streamingAssetsPath, "snap1.wav");
             InitSPlayer(StreamingAssetsBundlesFolder);
-#endif
+        #endif
     }
 
 #if UNITY_ANDROID
@@ -39,9 +47,9 @@ public class InstatiateGlobalVars : MonoBehaviour
 	{
         return javaObject;
 	}
-    public AndroidJavaClass GetPluginJavaClass()
+    public AndroidJavaObject GetPluginJavaClass()
 	{
-        return jc;
+        return jcInstance;
 	}
 #endif
 }

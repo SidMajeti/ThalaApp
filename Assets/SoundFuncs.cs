@@ -16,7 +16,9 @@ public class SoundFuncs : MonoBehaviour
     public Button volume;
     public Sprite mutedImage;
     public Sprite soundImage;
-    bool mute = false;
+    public bool mute = false;
+    AndroidJavaObject jc;
+    public Canvas canvas;
     void Start()
     {
         volume = volume.GetComponent<Button>();
@@ -25,16 +27,32 @@ public class SoundFuncs : MonoBehaviour
 
     void TaskOnClick()
     {
-#if UNITY_IOS
+        #if UNITY_IOS
+            if (mute == false)
+            {
+                IOSMuteSound();
+                mute = true;
+                volume.GetComponent<Image>().sprite = mutedImage;
+            }
+            else
+            {
+                IOSUnMuteSound();
+                mute = false;
+                volume.GetComponent<Image>().sprite = soundImage;
+            }
+        #endif
+
+#if UNITY_ANDROID
+        jc = canvas.GetComponent<InstatiateGlobalVars>().GetPluginJavaClass();
         if (mute == false)
         {
-            IOSMuteSound();
+            jc.CallStatic("metroStopBpm");
             mute = true;
             volume.GetComponent<Image>().sprite = mutedImage;
         }
         else
         {
-            IOSUnMuteSound();
+            jc.CallStatic("playSound");
             mute = false;
             volume.GetComponent<Image>().sprite = soundImage;
         }

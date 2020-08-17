@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using System.Text.RegularExpressions;
 
 //changes animation speed
 //updates inputField with speed and stops audio when necessary
@@ -29,6 +30,7 @@ public class AdjustSpeed : MonoBehaviour
     public Canvas mainCanvas;
     AnimatorControllerParameter[] parameters;
     AudioSource audioSource;
+    double offset;
 
     // Start is called before the first frame update
     void Start()
@@ -44,11 +46,6 @@ public class AdjustSpeed : MonoBehaviour
         exitPopUp.onClick.AddListener(ExitPopUp);
         parameters = m_Animator.parameters;
         audioSource = m_Animator.GetComponent<AudioSource>();
-//#if UNITY_IOS
-//        float lengthOfAudio = audioSource.clip.length;
-//        float secperBeat = 60 / (float.Parse(inputField.text));
-//        IOSChangeSpeed(lengthOfAudio / secperBeat);
-//#endif
     }
 
     void ExitPopUp()
@@ -60,12 +57,15 @@ public class AdjustSpeed : MonoBehaviour
 
     void ChangeSpeed(String val)
     {
-        bool isNumeric = double.TryParse(val, out beats);
-        if (!isNumeric)
+        float beats = 0.0f;
+        if (val != "")
         {
-            popUpError.enabled = true;
-            mainCanvas.GetComponent<CanvasGroup>().interactable = false;
-            popUpError.GetComponent<CanvasGroup>().interactable = true;
+            beats = float.Parse(val);
+        }
+
+        if (beats > 200.0f || beats < 45.0f)
+        {
+            inputField.ActivateInputField();
         }
         else
         {
@@ -73,6 +73,7 @@ public class AdjustSpeed : MonoBehaviour
             m_Animator.speed = animSpeed;
             m_Animator.SetBool("StopAnim", false);
         }
+        
     }
 
     void TaskOnClick()

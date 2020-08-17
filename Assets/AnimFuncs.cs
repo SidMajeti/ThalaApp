@@ -18,21 +18,40 @@ public class AnimFuncs : MonoBehaviour
 #endif
     Animator m_Animator;
     public Button start;
-    public Dropdown dropdown;
+    public Dropdown thalaDropdown;
+    public Dropdown kalaiDropdown;
     AnimatorControllerParameter[] parameters;
     public Canvas canvas;
-    bool isStopButton;
+    public bool isStopButton;
     public Sprite playImage;
     public Sprite stopImage;
 
     // Start is called before the first frame update
     void Start()
     {
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
         m_Animator = gameObject.GetComponent<Animator>();
         start = start.GetComponent<Button>();
         start.onClick.AddListener(TaskOnClick);
         parameters = m_Animator.parameters;
         isStopButton = false;
+        thalaDropdown.onValueChanged.AddListener(TaskOnValueChanged);
+        kalaiDropdown.onValueChanged.AddListener(TaskOnValueChanged);
+    }
+
+    void TaskOnValueChanged(int value)
+    {
+        m_Animator.SetBool("StopAnim", true);   
+        for (int i = 0; i < parameters.Length - 2; i++)
+        {
+            m_Animator.SetBool(parameters[i].name, false);
+        }
+#if UNITY_IOS
+        IOSStopSound();
+#endif
+        isStopButton = false;
+        start.GetComponent<Image>().color = Color.white;
+        start.GetComponent<Image>().sprite = playImage;
     }
 
     void TaskOnClick()
@@ -40,7 +59,7 @@ public class AnimFuncs : MonoBehaviour
         if(isStopButton)
         {
             m_Animator.SetBool("StopAnim", true);
-            for(int i = 0; i < parameters.Length - 1; i++)
+            for(int i = 0; i < parameters.Length - 2; i++)
             {
                 m_Animator.SetBool(parameters[i].name, false);
             }
@@ -54,8 +73,10 @@ public class AnimFuncs : MonoBehaviour
         else
         {
             m_Animator.SetBool("StopAnim", false);
-            int val = dropdown.value;
+            int val = thalaDropdown.value;
+            int valofKalai = kalaiDropdown.value + 1;
             m_Animator.SetBool(parameters[val].name, true);
+            m_Animator.SetInteger("KalaiNum", valofKalai);
             isStopButton = true;
             start.GetComponent<Image>().sprite = stopImage;
             start.GetComponent<Image>().color = Color.red;
