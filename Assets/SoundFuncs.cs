@@ -46,13 +46,13 @@ public class SoundFuncs : MonoBehaviour
         jc = canvas.GetComponent<InstatiateGlobalVars>().GetPluginJavaClass();
         if (mute == false)
         {
-            jc.CallStatic("metroStopBpm");
+            jc.Call("stop");
             mute = true;
             volume.GetComponent<Image>().sprite = mutedImage;
         }
         else
         {
-            jc.CallStatic("playSound");
+            //jc.CallStatic("playSound");
             mute = false;
             volume.GetComponent<Image>().sprite = soundImage;
         }

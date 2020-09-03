@@ -28,25 +28,52 @@ public class PlaySound : StateMachineBehaviour
     AndroidJavaObject jc;
     int counter;
     bool isMuted;
-    float startTime = 0.0f;
+    const float lengthOfAudio = 0.260f;
+    float beats;
     float currentTime;
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-     
-        startTime = Time.time;
+        //currentTime = Time.time * 1000;
+        //float pastTime = animator.GetComponent<GetTime>().getTime();
+        //Debug.Log(currentTime - pastTime);
+        //animator.GetComponent<GetTime>().setTime(currentTime);
         isMuted = animator.GetComponent<SoundFuncs>().mute;
-        //audioSource = animator.GetComponent<AudioSource>();
         inputField = animator.GetComponent<AdjustSpeed>().inputField;
-        //secperBeat = 60 / (float.Parse(inputField.text));
-        //float lengthOfAudio = audioSource.clip.length;
+        beats = float.Parse(inputField.text);
 #if UNITY_ANDROID
             jc = animator.GetComponent<InstatiateGlobalVars>().GetPluginJavaClass();
-            jc.Call("metroSetBpm", int.Parse(inputField.text));
-            bool isPlaying = jc.Get<bool>("isplaying");
-            if (!isPlaying)
+            bool isPlaying = jc.Call<bool>("isPlaying");
+            float currBeats = jc.Call<float>("getBpm");
+            beats *= stateInfo.speed;
+            if (!isMuted && (!isPlaying || currBeats != beats || animator.GetBool("StartKhandaChapu") || animator.GetBool("StartMisra")) && !inputField.isFocused)
             {
-                jc.Call("playSound");
+                jc.Call("setBpm", beats);
+                if (isPlaying && currBeats != beats)
+                {
+                    //Debug.Log("called stop");
+                    jc.Call("stop");
+                }
+                if (animator.GetBool("StartKhandaChapu"))
+                {
+                    if (isPlaying){
+                        Debug.Log("StoppedKhanda");
+                        jc.Call("stop");
+                    }
+                    jc.Call("play", "KhandaChapu");
+                }
+                //else if (stateInfo.IsTag("MisraTag1"))
+                //{
+                //    jc.Call("play", "MisraTag1");
+                //}
+                else if (stateInfo.IsTag("MisraTag2"))
+                {
+                    jc.Call("play", "MisraTag2");
+                }
+                else
+                {
+                    jc.Call("play", "");
+                }
             }
 #endif
 
@@ -92,7 +119,7 @@ public class PlaySound : StateMachineBehaviour
 #if UNITY_ANDROID
                 if (inputField.isFocused == true)
                 {
-                    jc.CallStatic("metroStopBpm");
+                    jc.Call("stop");
                 }
 #endif
 

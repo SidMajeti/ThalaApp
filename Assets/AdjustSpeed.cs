@@ -22,8 +22,8 @@ public class AdjustSpeed : MonoBehaviour
     public Button incrSpeed;
     public Button decrSpeed;
     public Button exitPopUp;
-    const int framesPerBeat = 20;
-    const int framesPerSecond = 24;
+    const int framesPerBeat = 24;
+    const int framesPerSecond = 30;
     Animator m_Animator;
     double beats;
     public Canvas popUpError;
@@ -35,6 +35,9 @@ public class AdjustSpeed : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //QualitySettings.vSyncCount = 0;
+        //Application.targetFrameRate = 24;
+        //framesPerSecond = Application.targetFrameRate;
         incrSpeed = incrSpeed.GetComponent<Button>();
         decrSpeed = decrSpeed.GetComponent<Button>();
         inputField = inputField.GetComponent<TMP_InputField>();

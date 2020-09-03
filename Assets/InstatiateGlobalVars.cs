@@ -22,15 +22,9 @@ public class InstatiateGlobalVars : MonoBehaviour
         #if UNITY_ANDROID
             javaClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
             javaObject = javaClass.GetStatic<AndroidJavaObject>("currentActivity");
-            jc = new AndroidJavaClass("com.thalaapp.unityplugin.Metronome");
-            jcInstance = jc.CallStatic<AndroidJavaObject>("getInstance");
-            jcInstance.Call("initMetroTask", jcInstance);
-            //Debug.Log("instantiated class properly");
-            jcInstance.Call("setBeatSound", 2440.0);
-            //Debug.Log("Beat sound: " + bs);
-            //Debug.Log("called beat sound method");
-            jcInstance.Call("setSound", 6440.0);
-            jcInstance.Call("setBeat", 8);
+            jc = new AndroidJavaClass("com.majeti.unity.Metronome");
+            jcInstance = jc.GetStatic<AndroidJavaObject>("myInstance");
+            jcInstance.Call("initSoundFile", javaObject, "snap16bit.wav");
         #endif
         #if UNITY_IOS
             string StreamingAssetsBundlesFolder = Path.Combine(Application.streamingAssetsPath, "snap1.wav");

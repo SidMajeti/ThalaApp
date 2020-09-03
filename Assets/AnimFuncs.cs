@@ -25,6 +25,7 @@ public class AnimFuncs : MonoBehaviour
     public bool isStopButton;
     public Sprite playImage;
     public Sprite stopImage;
+    AndroidJavaObject jc;
 
     // Start is called before the first frame update
     void Start()
@@ -37,6 +38,9 @@ public class AnimFuncs : MonoBehaviour
         isStopButton = false;
         thalaDropdown.onValueChanged.AddListener(TaskOnValueChanged);
         kalaiDropdown.onValueChanged.AddListener(TaskOnValueChanged);
+#if UNITY_ANDROID
+        jc = m_Animator.GetComponent<InstatiateGlobalVars>().GetPluginJavaClass();
+#endif
     }
 
     void TaskOnValueChanged(int value)
@@ -48,6 +52,10 @@ public class AnimFuncs : MonoBehaviour
         }
 #if UNITY_IOS
         IOSStopSound();
+#endif
+#if UNITY_ANDROID
+        while(jc.Call<bool>("isPlaying"))
+            jc.Call("stop");
 #endif
         isStopButton = false;
         start.GetComponent<Image>().color = Color.white;
@@ -66,12 +74,18 @@ public class AnimFuncs : MonoBehaviour
             isStopButton = false;
             start.GetComponent<Image>().color = Color.white;
             start.GetComponent<Image>().sprite = playImage;
-            #if UNITY_IOS
+#if UNITY_IOS
                 IOSStopSound();
-            #endif
+#endif
+#if UNITY_ANDROID
+            while(jc.Call<bool>("isPlaying"))
+                jc.Call("stop");
+#endif
         }
         else
         {
+            float currentTime = Time.time * 1000;
+            Debug.Log("Time when play is pressed : " +currentTime);
             m_Animator.SetBool("StopAnim", false);
             int val = thalaDropdown.value;
             int valofKalai = kalaiDropdown.value + 1;
