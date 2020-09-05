@@ -20,6 +20,10 @@ public class PlaySound : StateMachineBehaviour
     private static extern bool IOSIsPlaying();
     [DllImport("__Internal")]
     private static extern float IOSGetSpeed();
+    [DllImport("__Internal")]
+    private static extern void IOSSetLoopCount();
+    [DllImport("__Internal")]
+    private static extern int IOSGetLoopCount();
 
 #endif
     AudioSource audioSource;
@@ -80,19 +84,22 @@ public class PlaySound : StateMachineBehaviour
 #if UNITY_IOS
             float currspeed = IOSGetSpeed();
             float speed = float.Parse(inputField.text);
+            IOSSetLoopCount();
+            int loopCount = IOSGetLoopCount();
             //if (stateInfo.IsTag("LastTapKhanda"))
             //{
             //    speed *= 2;
             //}
             speed *= stateInfo.speed;
             bool isPlaying = IOSIsPlaying();
-            if (!isMuted && (!isPlaying || (speed != currspeed) || animator.GetBool("StartKhandaChapu") || animator.GetBool("StartMisra")))
+            if (!isMuted && (!isPlaying || (speed != currspeed) || animator.GetBool("StartKhandaChapu") || animator.GetBool("StartMisra") || loopCount > 60))
             {
                 //if (speed != currspeed && !stateInfo.IsTag("LastTapKhanda")) { IOSStopSound();}
                 if (animator.GetBool("StartMisra"))
                 {
                     IOSStopSound();
                     if (stateInfo.IsTag("MisraTag1")) { IOSPlaySound(speed, "MisraTag", 0, 1); }
+                    else if (stateInfo.IsTag("MisraTag2")) { IOSPlaySound(speed, "MisraTag", 0, 2); }
                     else if(stateInfo.IsTag("MisraTag3") || stateInfo.IsTag("MisraTag4")) {IOSPlaySound(speed, "MisraTag", 0, 3); }
                     else { IOSPlaySound(speed, "MisraTag", 0, 0); }
                 }

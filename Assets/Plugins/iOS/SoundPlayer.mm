@@ -15,6 +15,7 @@
 static SoundPlayer *_sharedInstance;
 double firstime = 0;
 float currSpeed = 0.0f;
+int loopcount = 0;
 
 +(SoundPlayer*) sharedInstance
 {
@@ -67,64 +68,49 @@ float currSpeed = 0.0f;
     return buffermainclick;
 }
 
-//-(AVAudioPCMBuffer*)generateKhandaBuffer:(float) bpm :(int)khandaCount{
-//    NSError *error = nil;
-//    [audioFileMainClick setFramePosition:0];
-//
-//    int beatLength = AVAudioFrameCount(audioFileMainClick.processingFormat.sampleRate * 60 / (bpm*2));
-//    AVAudioPCMBuffer *buffermainclick;
-//    if(khandaCount != 2){
-//        buffermainclick = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audioFileMainClick.processingFormat frameCapacity:beatLength*2];
-//    }
-//    else{
-//        buffermainclick = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audioFileMainClick.processingFormat frameCapacity:beatLength];
-//    }
-//
-//
-//    [audioFileMainClick readIntoBuffer:buffermainclick frameCount:beatLength error:&error];
-////    [buffermainclick setFrameLength:beatLength];
-//
-//    return buffermainclick;
-//}
 
 //very slight lag
 //prevent user from going over a certain speed: 200?
 -(void)playSound:(float) speed :(NSString*) tag :(int)khandaCount :(int)misraCount{
+    loopcount = 0;
     currSpeed = speed;
-    if(speed > 100.0f){
-        speed -= 2.0* (speed - 100)/ 100.0;
+    if(speed > 90.0f){
+        speed -= 4.0* (speed - 100)/ 100.0;
     }
     if(![tag isEqualToString:@"KhandaTag"]){
-        speed -= 1.20f * speed/72;
+        speed -= 5.50f * speed/75.0;
     }
     else{
-        speed -= 1.00f * speed/72;
+        speed -= 1.00f * speed/75.0;
     }
     dispatch_time_t delay;
     if(misraCount == 3){
         NSLog(@"Tag worked");
-        delay = dispatch_time(DISPATCH_TIME_NOW, 0.15*(72.0/speed)*NSEC_PER_SEC);
+        delay = dispatch_time(DISPATCH_TIME_NOW, 0.15*(75.0/speed)*NSEC_PER_SEC);
     }
     else if(misraCount == 1){
-        delay = dispatch_time(DISPATCH_TIME_NOW, 0.08*(72.0/speed)*NSEC_PER_SEC);
+        delay = dispatch_time(DISPATCH_TIME_NOW, 0.08*(75.0/speed)*NSEC_PER_SEC);
+    }
+    else if(misraCount == 2){
+        delay = dispatch_time(DISPATCH_TIME_NOW, 0.04*(75.0/speed)*NSEC_PER_SEC);
     }
     else if([tag isEqualToString:@"MisraTag"]){
         delay = dispatch_time(DISPATCH_TIME_NOW, 0*NSEC_PER_SEC);
     }
     else if(khandaCount == 2){
-        delay = dispatch_time(DISPATCH_TIME_NOW, 0.2*(72.0/speed)*NSEC_PER_SEC);
+        delay = dispatch_time(DISPATCH_TIME_NOW, 0.2*(75.0/speed)*NSEC_PER_SEC);
     }
     else if(khandaCount == 3){
-        delay = dispatch_time(DISPATCH_TIME_NOW, 0.10*(72.0/speed)*NSEC_PER_SEC);
+        delay = dispatch_time(DISPATCH_TIME_NOW, 0.10*(75.0/speed)*NSEC_PER_SEC);
     }
     else if([tag isEqualToString:@"KhandaTag"]){
-        delay = dispatch_time(DISPATCH_TIME_NOW, 0.15*(72.0/speed)*NSEC_PER_SEC);
+        delay = dispatch_time(DISPATCH_TIME_NOW, 0.15*(75.0/speed)*NSEC_PER_SEC);
     }
     else if (speed > 66.0f){
-        delay = dispatch_time(DISPATCH_TIME_NOW, 0.5*pow((72.0/speed), 2)*NSEC_PER_SEC);
+        delay = dispatch_time(DISPATCH_TIME_NOW, 0.3*pow((75.0/speed), 2)*NSEC_PER_SEC);
     }
     else{
-        delay = dispatch_time(DISPATCH_TIME_NOW, 0.5*(72.0/speed)*NSEC_PER_SEC);
+        delay = dispatch_time(DISPATCH_TIME_NOW, 0.5*(75.0/speed)*NSEC_PER_SEC);
     }
     dispatch_after(delay, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         AVAudioPCMBuffer *buffer;
@@ -133,17 +119,10 @@ float currSpeed = 0.0f;
 //        }
         buffer = [_sharedInstance generateBuffer:speed];
         if(audioEngine.isRunning){
-//            NSLog(@"Audio Engine is running");
             if ([audioPlayerNode isPlaying]) {
-//                NSLog(@"Audio is playing");
-//                [audioPlayerNode stop];
-//                [audioPlayerNode play];
                 [audioPlayerNode scheduleBuffer:buffer atTime:nil options:AVAudioPlayerNodeBufferInterrupts completionHandler:nil];
             } else {
-//                NSLog(@"Audio is playing");
-//                NSLog(@"Speed is %f", speed);
                 [audioPlayerNode play];
-//                [audioPlayerNode scheduleBuffer:buffer atTime:nil options:AVAudioPlayerNodeBufferLoops completionHandler:nil];
             }
             if(!([tag isEqualToString:@"KhandaTag"] || [tag isEqualToString:@"MisraTag"])){
                 [audioPlayerNode scheduleBuffer:buffer atTime:nil options:AVAudioPlayerNodeBufferLoops completionHandler:nil];
@@ -163,7 +142,6 @@ float currSpeed = 0.0f;
     if([audioEngine isRunning]){
         [audioPlayerNode stop];
     }
-        
 }
 
 -(float)getSpeed{
@@ -178,13 +156,14 @@ float currSpeed = 0.0f;
     [audioEngine pause];
 }
 
-//-(bool)isPlaying{
-//    return player.isPlaying;
-//}
+-(void) setLoopCount{
+    loopcount += 1;
+}
 
-/*-(void)seekTo{
-    player.currentTime = 0;
-}*/
+-(int) getLoopCount{
+    return loopcount;
+}
+
 
 @end
 
@@ -214,8 +193,11 @@ extern "C"
     float IOSGetSpeed(){
         return [[SoundPlayer sharedInstance] getSpeed];
     }
-//    void SeekTo(){
-//        [[SoundPlayer sharedInstance] seekTo];
-//    }
+    int IOSGetLoopCount(){
+        return [[SoundPlayer sharedInstance] getLoopCount];
+    }
+    void IOSSetLoopCount(){
+        [[SoundPlayer sharedInstance] setLoopCount];
+    }
 }
 

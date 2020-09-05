@@ -745,6 +745,9 @@ PlayerSettings:
       daydreamIconForeground: {fileID: 0}
       daydreamIconBackground: {fileID: 0}
   cloudServicesEnabled:
+    Analytics: 1
+    Build: 1
+    Purchasing: 1
     UNet: 1
   luminIcon:
     m_Name: 
@@ -758,10 +761,10 @@ PlayerSettings:
     m_VersionCode: 1
     m_VersionName: 
   apiCompatibilityLevel: 6
-  cloudProjectId: 
+  cloudProjectId: e966b003-0766-4cb2-90d3-7c6da7dcdd87
   framebufferDepthMemorylessMode: 0
-  projectName: 
-  organizationId: 
+  projectName: ThalaApp
+  organizationId: sidm23
   cloudEnabled: 0
   enableNativePlatformBackendsForNewInputSystem: 0
   disableOldInputManagerSupport: 0
