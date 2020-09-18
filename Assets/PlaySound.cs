@@ -49,30 +49,28 @@ public class PlaySound : StateMachineBehaviour
             jc = animator.GetComponent<InstatiateGlobalVars>().GetPluginJavaClass();
             bool isPlaying = jc.Call<bool>("isPlaying");
             float currBeats = jc.Call<float>("getBpm");
-            beats *= stateInfo.speed;
-            if (!isMuted && (!isPlaying || currBeats != beats || animator.GetBool("StartKhandaChapu") || animator.GetBool("StartMisra")) && !inputField.isFocused)
+            if (!isMuted && (!isPlaying || currBeats != beats) && !inputField.isFocused)
             {
                 jc.Call("setBpm", beats);
                 if (isPlaying && currBeats != beats)
                 {
-                    //Debug.Log("called stop");
                     jc.Call("stop");
                 }
                 if (animator.GetBool("StartKhandaChapu"))
                 {
-                    if (isPlaying){
-                        Debug.Log("StoppedKhanda");
-                        jc.Call("stop");
-                    }
-                    jc.Call("play", "KhandaChapu");
+                    if (stateInfo.IsTag("KhandaTag1")) { jc.Call("play", "KhandaChapu1"); }
+                    else if (stateInfo.IsTag("KhandaTag3")) { jc.Call("play", "KhandaChapu3"); }
+                    else { jc.Call("play", "KhandaChapu2"); }
                 }
-                //else if (stateInfo.IsTag("MisraTag1"))
-                //{
-                //    jc.Call("play", "MisraTag1");
-                //}
-                else if (stateInfo.IsTag("MisraTag2"))
+                else if (animator.GetBool("StartMisra"))
                 {
-                    jc.Call("play", "MisraTag2");
+                    if (stateInfo.IsTag("MisraTag1")) {
+                        Debug.Log("Misra1 gets called");
+                        jc.Call("play", "MisraTag1");
+                    }
+                    else if (stateInfo.IsTag("MisraTag2")) { jc.Call("play", "MisraTag2"); }
+                    else if (stateInfo.IsTag("MisraTag3")) { jc.Call("play", "MisraTag3"); }
+                    else { jc.Call("play", "MisraTag4");}
                 }
                 else
                 {

@@ -66,7 +66,7 @@ public class AdjustSpeed : MonoBehaviour
             beats = float.Parse(val);
         }
 
-        if (beats > 200.0f || beats < 45.0f)
+        if (beats > 170.0f || beats < 45.0f)
         {
             inputField.ActivateInputField();
         }
