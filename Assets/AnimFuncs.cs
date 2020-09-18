@@ -84,8 +84,8 @@ public class AnimFuncs : MonoBehaviour
         }
         else
         {
-            float currentTime = Time.time * 1000;
-            Debug.Log("Time when play is pressed : " +currentTime);
+            //float currentTime = Time.time * 1000;
+            //Debug.Log("Time when play is pressed : " +currentTime);
             m_Animator.SetBool("StopAnim", false);
             int val = thalaDropdown.value;
             int valofKalai = kalaiDropdown.value + 1;

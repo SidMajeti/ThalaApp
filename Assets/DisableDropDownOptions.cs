@@ -16,7 +16,7 @@ public class DisableDropDownOptions : MonoBehaviour
     void Update()
     {
         //remove 2nd kalai option 
-        if (thalaDropDown.value > 1 && kalaiDropdown.options.Count == 2)
+        if (thalaDropDown.value != 1 && kalaiDropdown.options.Count == 2)
         {
             //1st kalai automatically change
             kalaiDropdown.value = 0;
