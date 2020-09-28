@@ -81,34 +81,28 @@ public class PlaySound : StateMachineBehaviour
 
 #if UNITY_IOS
             float currspeed = IOSGetSpeed();
-            float speed = float.Parse(inputField.text);
-            IOSSetLoopCount();
-            int loopCount = IOSGetLoopCount();
-            //if (stateInfo.IsTag("LastTapKhanda"))
-            //{
-            //    speed *= 2;
-            //}
-            speed *= stateInfo.speed;
+            //float speed = float.Parse(inputField.text);
             bool isPlaying = IOSIsPlaying();
-            if (!isMuted && (!isPlaying || (speed != currspeed) || animator.GetBool("StartKhandaChapu") || animator.GetBool("StartMisra") || loopCount > 60))
+            if (!isMuted && (!isPlaying || (beats != currspeed)) && !inputField.isFocused)
             {
-                //if (speed != currspeed && !stateInfo.IsTag("LastTapKhanda")) { IOSStopSound();}
+                if(isPlaying && currspeed != beats) {
+                    Debug.Log("Sound is stopped");
+                    IOSStopSound();
+                }
                 if (animator.GetBool("StartMisra"))
                 {
-                    IOSStopSound();
-                    if (stateInfo.IsTag("MisraTag1")) { IOSPlaySound(speed, "MisraTag", 0, 1); }
-                    else if (stateInfo.IsTag("MisraTag2")) { IOSPlaySound(speed, "MisraTag", 0, 2); }
-                    else if(stateInfo.IsTag("MisraTag3") || stateInfo.IsTag("MisraTag4")) {IOSPlaySound(speed, "MisraTag", 0, 3); }
-                    else { IOSPlaySound(speed, "MisraTag", 0, 0); }
+                    if (stateInfo.IsTag("MisraTag1")) { IOSPlaySound(beats, "MisraTag", 0, 1); }
+                    else if (stateInfo.IsTag("MisraTag2")) { IOSPlaySound(beats, "MisraTag", 0, 2); }
+                    else if(stateInfo.IsTag("MisraTag3")) {IOSPlaySound(beats, "MisraTag", 0, 3); }
+                    else { IOSPlaySound(beats, "MisraTag", 0, 4); }
                 }
                 else if(animator.GetBool("StartKhandaChapu"))
                 {
-                    IOSStopSound();
-                    if (stateInfo.IsTag("KhandaTag2")) {IOSPlaySound(speed, "KhandaTag", 2,0); }
-                    else if(stateInfo.IsTag("KhandaTag3")) { IOSPlaySound(speed, "KhandaTag", 3,0); }
-                    else { IOSPlaySound(speed, "KhandaTag", 0, 0); }
+                    if (stateInfo.IsTag("KhandaTag1")) {IOSPlaySound(beats, "KhandaTag", 1,0); }
+                    else if(stateInfo.IsTag("KhandaTag2")) { IOSPlaySound(beats, "KhandaTag", 2,0); }
+                    else { IOSPlaySound(beats, "KhandaTag", 3, 0); }
                 }
-                else { IOSPlaySound(speed, "", 0, 0);}
+                else { IOSPlaySound(beats, "", 0, 0);}
             }
 #endif
 
@@ -129,13 +123,8 @@ public class PlaySound : StateMachineBehaviour
 #endif
 
 #if UNITY_IOS       
-            if (IOSIsPlaying())
+            if(inputField.isFocused == true)
             {
-                //Debug.Log("sound is still playing");
-            }
-            if(inputField.isFocused == true || !animator.GetComponent<AnimFuncs>().isStopButton)
-            {
-                //Debug.Log("stopping sound");
                 IOSStopSound();
             }   
         #endif

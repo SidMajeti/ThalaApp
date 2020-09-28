@@ -59,7 +59,7 @@ int loopcount = 0;
     NSError *error = nil;
     [audioFileMainClick setFramePosition:0];
     
-    int beatLength = AVAudioFrameCount(audioFileMainClick.processingFormat.sampleRate * 60 / bpm);
+    int beatLength = AVAudioFrameCount(48000 * 60.0 / bpm);
     AVAudioPCMBuffer *buffermainclick = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audioFileMainClick.processingFormat frameCapacity:beatLength];
     
     [audioFileMainClick readIntoBuffer:buffermainclick error:&error];
@@ -68,68 +68,110 @@ int loopcount = 0;
     return buffermainclick;
 }
 
+-(int) mod:(int)a :(int) b{
+    int ret = a % b;
+    if(ret < 0)
+        ret+=b;
+    return ret;
+}
+-(AVAudioPCMBuffer*)generateKhandaBuffer:(float) bpm dis:(int) displacement{
+    NSError *error = nil;
+    [audioFileMainClick setFramePosition:0];
+    
+    int beatLength = 48000 * 60.0 / bpm;
+    AVAudioPCMBuffer *regBuffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audioFileMainClick.processingFormat frameCapacity:beatLength];
 
-//very slight lag
-//prevent user from going over a certain speed: 200?
+    
+    AVAudioPCMBuffer *khandaBuffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audioFileMainClick.processingFormat frameCapacity:int(2.5 * 48000 * 60.0 / bpm)];
+    khandaBuffer.frameLength = int(2.5 * 48000 * 60.0 / bpm);
+    
+    [audioFileMainClick readIntoBuffer:regBuffer error:&error];
+    [regBuffer setFrameLength:beatLength];
+    
+    for(int i = 0; i < [[audioFileMainClick processingFormat] channelCount]; i++){
+        memcpy(khandaBuffer.floatChannelData[i] + [_sharedInstance mod: -displacement :khandaBuffer.frameLength], regBuffer.floatChannelData[i] + int(1000*pow(bpm/75.0,0.5)), regBuffer.frameLength - int(1000*pow(bpm/75.0,0.5)));
+        memcpy(khandaBuffer.floatChannelData[i] + [_sharedInstance mod:(regBuffer.frameLength - displacement) :khandaBuffer.frameLength], regBuffer.floatChannelData[i] + int(2000*pow(bpm/75.0,0.5)), int(regBuffer.frameLength/2.0));
+        memcpy(khandaBuffer.floatChannelData[i] +  [_sharedInstance mod:(int(1.5 * 48000 * 60.0 / bpm) - displacement) :khandaBuffer.frameLength], regBuffer.floatChannelData[i] + int(2000*pow(bpm/75.0,0.5)), regBuffer.frameLength - int(2000*pow(bpm/75.0,0.5)));
+    }
+    return khandaBuffer;
+}
+
+-(AVAudioPCMBuffer*)generateMisraBuffer:(float) bpm dis:(int) displacement{
+    NSError *error = nil;
+    [audioFileMainClick setFramePosition:0];
+    
+    int beatLength = 48000 * 60.0 / bpm;
+    AVAudioPCMBuffer *regBuffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audioFileMainClick.processingFormat frameCapacity:beatLength];
+
+    
+    AVAudioPCMBuffer *misraBuffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audioFileMainClick.processingFormat frameCapacity:int(3.5 * 48000 * 60.0 / bpm)];
+    misraBuffer.frameLength = int(3.5 * 48000 * 60.0 / bpm);
+    
+    [audioFileMainClick readIntoBuffer:regBuffer error:&error];
+    [regBuffer setFrameLength:beatLength];
+    
+    for(int i = 0; i < [[audioFileMainClick processingFormat] channelCount]; i++){
+        memcpy(misraBuffer.floatChannelData[i] + [_sharedInstance mod:-displacement :misraBuffer.frameLength], regBuffer.floatChannelData[i] + int(2000*pow(bpm/90.0,2)), int(0.5 * regBuffer.frameLength));
+        memcpy(misraBuffer.floatChannelData[i] + [_sharedInstance mod:(int(0.5 * 48000 * 60.0 / bpm) -displacement) :misraBuffer.frameLength], regBuffer.floatChannelData[i], regBuffer.frameLength);
+        memcpy(misraBuffer.floatChannelData[i] + [_sharedInstance mod:(int(1.5 * 48000 * 60.0 / bpm) -displacement) :misraBuffer.frameLength] , regBuffer.floatChannelData[i], regBuffer.frameLength);
+        memcpy(misraBuffer.floatChannelData[i] +  [_sharedInstance mod:(int(2.5 * 48000 * 60.0 / bpm) - displacement) :misraBuffer.frameLength], regBuffer.floatChannelData[i], regBuffer.frameLength);
+    }
+    return misraBuffer;
+}
+
+
 -(void)playSound:(float) speed :(NSString*) tag :(int)khandaCount :(int)misraCount{
     loopcount = 0;
     currSpeed = speed;
-    if(speed > 90.0f){
-        speed -= 4.0* (speed - 100)/ 100.0;
-    }
-    if(![tag isEqualToString:@"KhandaTag"]){
-        speed -= 5.50f * speed/75.0;
-    }
-    else{
-        speed -= 1.00f * speed/75.0;
-    }
     dispatch_time_t delay;
-    if(misraCount == 3){
-        NSLog(@"Tag worked");
-        delay = dispatch_time(DISPATCH_TIME_NOW, 0.15*(75.0/speed)*NSEC_PER_SEC);
-    }
-    else if(misraCount == 1){
-        delay = dispatch_time(DISPATCH_TIME_NOW, 0.08*(75.0/speed)*NSEC_PER_SEC);
-    }
-    else if(misraCount == 2){
-        delay = dispatch_time(DISPATCH_TIME_NOW, 0.04*(75.0/speed)*NSEC_PER_SEC);
-    }
-    else if([tag isEqualToString:@"MisraTag"]){
-        delay = dispatch_time(DISPATCH_TIME_NOW, 0*NSEC_PER_SEC);
-    }
-    else if(khandaCount == 2){
-        delay = dispatch_time(DISPATCH_TIME_NOW, 0.2*(75.0/speed)*NSEC_PER_SEC);
-    }
-    else if(khandaCount == 3){
-        delay = dispatch_time(DISPATCH_TIME_NOW, 0.10*(75.0/speed)*NSEC_PER_SEC);
-    }
-    else if([tag isEqualToString:@"KhandaTag"]){
-        delay = dispatch_time(DISPATCH_TIME_NOW, 0.15*(75.0/speed)*NSEC_PER_SEC);
-    }
-    else if (speed > 66.0f){
-        delay = dispatch_time(DISPATCH_TIME_NOW, 0.3*pow((75.0/speed), 2)*NSEC_PER_SEC);
+    
+    if(!([tag isEqualToString:@"KhandaTag"] || [tag isEqualToString:@"MisraTag"])){
+        delay = dispatch_time(DISPATCH_TIME_NOW, 0.3*pow((75.0/speed), 1)*NSEC_PER_SEC);
     }
     else{
-        delay = dispatch_time(DISPATCH_TIME_NOW, 0.5*(75.0/speed)*NSEC_PER_SEC);
+        delay = dispatch_time(DISPATCH_TIME_NOW, 0.2*pow((75.0/speed), 2)*NSEC_PER_SEC);
     }
+    
     dispatch_after(delay, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         AVAudioPCMBuffer *buffer;
-//        if(khandaCount == 2 || misraCount == 1){
-//            buffer = [_sharedInstance generateBuffer:speed*2];
-//        }
-        buffer = [_sharedInstance generateBuffer:speed];
+        if(khandaCount == 1){
+            NSLog(@"Khanda1");
+            buffer = [_sharedInstance generateKhandaBuffer:speed dis:0];
+        }
+        else if(khandaCount == 2){
+            NSLog(@"Khanda2");
+            buffer = [_sharedInstance generateKhandaBuffer:speed dis:int(48000 * 60.0 / speed)];
+        }
+        else if(khandaCount == 3){
+            NSLog(@"Khanda3");
+            buffer = [_sharedInstance generateKhandaBuffer:speed dis:int(1.5 * 48000 * 60.0 / speed)];
+        }
+        else if(misraCount == 1){
+            NSLog(@"Misra1");
+            buffer = [_sharedInstance generateMisraBuffer:speed dis:0];
+        }
+        else if(misraCount == 2){
+            NSLog(@"Misra2");
+            buffer = [_sharedInstance generateMisraBuffer:speed dis:int(0.5*48000 * 60.0 / speed)];
+        }
+        else if(misraCount == 3){
+            NSLog(@"Misra3");
+            buffer = [_sharedInstance generateMisraBuffer:speed dis:int(1.5 * 48000 * 60.0 / speed)];
+        }
+        else if(misraCount == 4){
+            NSLog(@"Misra4");
+            //have to multiply float before due to loss of precision
+            buffer = [_sharedInstance generateMisraBuffer:speed dis:int(2.5 * 48000 * 60.0 / speed)];
+        }
+        else
+            buffer = [_sharedInstance generateBuffer:speed];
         if(audioEngine.isRunning){
             if ([audioPlayerNode isPlaying]) {
                 [audioPlayerNode scheduleBuffer:buffer atTime:nil options:AVAudioPlayerNodeBufferInterrupts completionHandler:nil];
             } else {
                 [audioPlayerNode play];
             }
-            if(!([tag isEqualToString:@"KhandaTag"] || [tag isEqualToString:@"MisraTag"])){
-                [audioPlayerNode scheduleBuffer:buffer atTime:nil options:AVAudioPlayerNodeBufferLoops completionHandler:nil];
-            }
-            else{
-                [audioPlayerNode scheduleBuffer:buffer completionHandler:nil];
-            }
+            [audioPlayerNode scheduleBuffer:buffer atTime:nil options: AVAudioPlayerNodeBufferLoops completionHandler:nil];
         }
     });
     
@@ -149,11 +191,17 @@ int loopcount = 0;
 }
 
 -(void) unmuteSound{
+    [audioEngine attachNode:audioPlayerNode];
+
+    [audioEngine connect:audioPlayerNode to:[audioEngine mainMixerNode] format:[audioFileMainClick processingFormat]];
+
+    [audioEngine prepare];
+
     [audioEngine startAndReturnError:nil];
 }
 
 -(void) muteSound{
-    [audioEngine pause];
+    [audioEngine stop];
 }
 
 -(void) setLoopCount{

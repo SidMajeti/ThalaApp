@@ -15,6 +15,8 @@ public class AnimFuncs : MonoBehaviour
     private static extern void IOSPlaySound(float speed);
     [DllImport("__Internal")]
     private static extern void IOSStopSound();
+    [DllImport("__Internal")]
+    private static extern bool IOSIsPlaying();
 #endif
     Animator m_Animator;
     public Button start;
@@ -30,7 +32,6 @@ public class AnimFuncs : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Screen.sleepTimeout = SleepTimeout.NeverSleep;
         m_Animator = gameObject.GetComponent<Animator>();
         start = start.GetComponent<Button>();
         start.onClick.AddListener(TaskOnClick);
@@ -51,7 +52,8 @@ public class AnimFuncs : MonoBehaviour
             m_Animator.SetBool(parameters[i].name, false);
         }
 #if UNITY_IOS
-        IOSStopSound();
+        while(IOSIsPlaying())
+            IOSStopSound();
 #endif
 #if UNITY_ANDROID
         while(jc.Call<bool>("isPlaying"))
@@ -75,15 +77,18 @@ public class AnimFuncs : MonoBehaviour
             start.GetComponent<Image>().color = Color.white;
             start.GetComponent<Image>().sprite = playImage;
 #if UNITY_IOS
+            while (IOSIsPlaying())
                 IOSStopSound();
 #endif
 #if UNITY_ANDROID
             while(jc.Call<bool>("isPlaying"))
                 jc.Call("stop");
 #endif
+            Screen.sleepTimeout = SleepTimeout.SystemSetting;
         }
         else
         {
+            Screen.sleepTimeout = SleepTimeout.NeverSleep;
             //float currentTime = Time.time * 1000;
             //Debug.Log("Time when play is pressed : " +currentTime);
             m_Animator.SetBool("StopAnim", false);

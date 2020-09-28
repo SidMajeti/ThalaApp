@@ -20,6 +20,7 @@ namespace UnityEngine.Purchasing
         [System.Serializable]
         public class OnPurchaseCompletedEvent : UnityEvent<Product>
         {
+
         };
 
         [System.Serializable]
@@ -29,6 +30,9 @@ namespace UnityEngine.Purchasing
 
         [HideInInspector]
         public string productId;
+
+        public Dropdown thalaDropdown;
+        public GameObject panel;
 
         [Tooltip("The type of this button, can be either a purchase or a restore button")]
         public ButtonType buttonType = ButtonType.Purchase;
@@ -79,13 +83,23 @@ namespace UnityEngine.Purchasing
                     button.onClick.AddListener(Restore);
                 }
             }
+            //InvokeRepeating("reInitializePurchase", 0, 15.0f);
+        }
+
+        void reInitializePurchase()
+        {
+            Debug.Log("requery");
+            CodelessIAPStoreListener.InitializePurchasing();
+            //CodelessIAPStoreListener.Instance.AddButton(this);
         }
 
         void OnEnable()
         {
+            Debug.Log("OnEnabled is called");
             if (buttonType == ButtonType.Purchase)
             {
                 CodelessIAPStoreListener.Instance.AddButton(this);
+                Debug.Log("Enters outer if");
                 if (CodelessIAPStoreListener.initializationComplete) {
                     UpdateText();
                 }
@@ -102,6 +116,7 @@ namespace UnityEngine.Purchasing
 
         void PurchaseProduct()
         {
+            Debug.Log("Product gets purchased again");
             if (buttonType == ButtonType.Purchase)
             {
                 Debug.Log("IAPButton.PurchaseProduct() with product ID: " + productId);

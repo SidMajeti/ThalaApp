@@ -23,7 +23,7 @@ public class AdjustSpeed : MonoBehaviour
     public Button decrSpeed;
     public Button exitPopUp;
     const int framesPerBeat = 24;
-    const int framesPerSecond = 30;
+    int framesPerSecond = 24;
     Animator m_Animator;
     double beats;
     public Canvas popUpError;
@@ -35,9 +35,10 @@ public class AdjustSpeed : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //QualitySettings.vSyncCount = 0;
+        //m_Animator.speed = animspeed;
+        QualitySettings.vSyncCount = 0;
         //Application.targetFrameRate = 24;
-        //framesPerSecond = Application.targetFrameRate;
+        Application.targetFrameRate = 60;
         incrSpeed = incrSpeed.GetComponent<Button>();
         decrSpeed = decrSpeed.GetComponent<Button>();
         inputField = inputField.GetComponent<TMP_InputField>();
@@ -45,7 +46,7 @@ public class AdjustSpeed : MonoBehaviour
         incrSpeed.onClick.AddListener(TaskOnClick);
         decrSpeed.onClick.AddListener(TaskOnClick);
         inputField.onEndEdit.AddListener(ChangeSpeed);
-        inputField.text = Convert.ToString((int)(m_Animator.speed * 60 * framesPerSecond / framesPerBeat)); ;
+        inputField.text = Convert.ToString((int)(1/0.8 * m_Animator.speed * 60.0f)); ;
         exitPopUp.onClick.AddListener(ExitPopUp);
         parameters = m_Animator.parameters;
         audioSource = m_Animator.GetComponent<AudioSource>();
@@ -62,17 +63,17 @@ public class AdjustSpeed : MonoBehaviour
     {
         float beats = 0.0f;
         if (val != "")
-        {
+        {     
             beats = float.Parse(val);
         }
 
-        if (beats > 170.0f || beats < 45.0f)
+        if (beats > 150.0f || beats < 45.0f)
         {
             inputField.ActivateInputField();
         }
         else
         {
-            float animSpeed = (float)(beats * framesPerBeat / (60 * framesPerSecond));
+            float animSpeed = (float)(0.8 * beats / 60.0);
             m_Animator.speed = animSpeed;
             m_Animator.SetBool("StopAnim", false);
         }

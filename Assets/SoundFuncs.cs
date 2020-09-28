@@ -12,6 +12,8 @@ public class SoundFuncs : MonoBehaviour
     private static extern void IOSMuteSound();
     [DllImport("__Internal")]
     private static extern void IOSUnMuteSound();
+    [DllImport("__Internal")]
+    private static extern void IOSStopSound();
 #endif
     public Button volume;
     public Sprite mutedImage;
@@ -30,13 +32,12 @@ public class SoundFuncs : MonoBehaviour
         #if UNITY_IOS
             if (mute == false)
             {
-                IOSMuteSound();
+                IOSStopSound();
                 mute = true;
                 volume.GetComponent<Image>().sprite = mutedImage;
             }
             else
             {
-                IOSUnMuteSound();
                 mute = false;
                 volume.GetComponent<Image>().sprite = soundImage;
             }
