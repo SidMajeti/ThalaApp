@@ -27,6 +27,8 @@ public class Purchaser : MonoBehaviour, IStoreListener
     double tstamp;
     bool wasPaused;
 
+    public bool loadCircle;
+
     bool isSubscribed;
 
     void Start()
@@ -125,6 +127,8 @@ public class Purchaser : MonoBehaviour, IStoreListener
         {
             // ... look up the Product reference with the general product identifier and the Purchasing 
             // system's products collection.
+            loadCircle = true;
+            subsButton.interactable = false;
             Product product = m_StoreController.products.WithID(productId);
 
             // If the look up found a product for this device's store and that product is ready to be sold ... 
@@ -285,6 +289,7 @@ public class Purchaser : MonoBehaviour, IStoreListener
                             List<string> options = new List<string> { "Adi Thalam", "Khanda Chapu Thalam", "Misra Chapu Thalam", "Ata Thalam" };
                             thalaDropdown.options.RemoveRange(1, 4);
                             thalaDropdown.RefreshShownValue();
+                            thalaDropdown.value = 0;
                             subsButton.gameObject.SetActive(true);
                             panel.gameObject.SetActive(true);
                         }
@@ -359,6 +364,7 @@ public class Purchaser : MonoBehaviour, IStoreListener
     public PurchaseProcessingResult ProcessPurchase(PurchaseEventArgs args)
     {
         Debug.Log("Process Purchase is called"); // A consumable product has been purchased by this user.
+        loadCircle = false;
         if (String.Equals(args.purchasedProduct.definition.id, kProductIDSubscription, StringComparison.Ordinal))
         {
             if (subsButton.gameObject.activeSelf)
@@ -388,6 +394,8 @@ public class Purchaser : MonoBehaviour, IStoreListener
 
     public void OnPurchaseFailed(Product product, PurchaseFailureReason failureReason)
     {
+        loadCircle = false;
+        subsButton.interactable = true;
         // A product purchase attempt did not succeed. Check failureReason for more detail. Consider sharing 
         // this reason with the user to guide their troubleshooting actions.
         Debug.Log(string.Format("OnPurchaseFailed: FAIL. Product: '{0}', PurchaseFailureReason: {1}", product.definition.storeSpecificId, failureReason));

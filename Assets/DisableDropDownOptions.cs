@@ -22,7 +22,7 @@ public class DisableDropDownOptions : MonoBehaviour
             kalaiDropdown.value = 0;
             kalaiDropdown.options.RemoveAt(1);
         }
-        else if(kalaiDropdown.options.Count <= 1 && thalaDropDown.value <= 1)
+        else if(kalaiDropdown.options.Count <= 1 && thalaDropDown.value == 1)
         {
             Debug.Log("Entered");
             kalaiDropdown.options.Add(new Dropdown.OptionData(){text = "2nd Kalai"});

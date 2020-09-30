@@ -19,15 +19,17 @@ public class InstatiateGlobalVars : MonoBehaviour
 #endif
     void Start()
     {
-        #if UNITY_ANDROID
+        //QualitySettings.vSyncCount = 0;
+        //Application.targetFrameRate = 60;
+#if UNITY_ANDROID
             javaClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
             javaObject = javaClass.GetStatic<AndroidJavaObject>("currentActivity");
             jc = new AndroidJavaClass("com.majeti.unity.Metronome");
             jcInstance = jc.GetStatic<AndroidJavaObject>("myInstance");
             jcInstance.Call("initSoundFile", javaObject, "snap16bit.wav");
-        #endif
-        #if UNITY_IOS
-            string StreamingAssetsBundlesFolder = Path.Combine(Application.streamingAssetsPath, "snap1.wav");
+#endif
+#if UNITY_IOS
+        string StreamingAssetsBundlesFolder = Path.Combine(Application.streamingAssetsPath, "snap1.wav");
             InitSPlayer(StreamingAssetsBundlesFolder);
         #endif
     }

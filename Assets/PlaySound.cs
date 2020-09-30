@@ -43,7 +43,7 @@ public class PlaySound : StateMachineBehaviour
         //Debug.Log(currentTime - pastTime);
         //animator.GetComponent<GetTime>().setTime(currentTime);
         isMuted = animator.GetComponent<SoundFuncs>().mute;
-        inputField = animator.GetComponent<AdjustSpeed>().inputField;
+        inputField = animator.GetComponent<SetUpScene>().inputField;
         beats = float.Parse(inputField.text);
 #if UNITY_ANDROID
             jc = animator.GetComponent<InstatiateGlobalVars>().GetPluginJavaClass();

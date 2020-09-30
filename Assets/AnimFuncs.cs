@@ -61,6 +61,7 @@ public class AnimFuncs : MonoBehaviour
 #endif
         isStopButton = false;
         start.GetComponent<Image>().color = Color.white;
+        start.GetComponent<RectTransform>().sizeDelta = new Vector2(159, 186);
         start.GetComponent<Image>().sprite = playImage;
     }
 
@@ -75,6 +76,7 @@ public class AnimFuncs : MonoBehaviour
             }
             isStopButton = false;
             start.GetComponent<Image>().color = Color.white;
+            start.GetComponent<RectTransform>().sizeDelta = new Vector2(159, 186);
             start.GetComponent<Image>().sprite = playImage;
 #if UNITY_IOS
             while (IOSIsPlaying())
@@ -97,8 +99,9 @@ public class AnimFuncs : MonoBehaviour
             m_Animator.SetBool(parameters[val].name, true);
             m_Animator.SetInteger("KalaiNum", valofKalai);
             isStopButton = true;
+            start.GetComponent<RectTransform>().sizeDelta = new Vector2(159, 159);
             start.GetComponent<Image>().sprite = stopImage;
-            start.GetComponent<Image>().color = Color.red;
+            //start.GetComponent<Image>().color = Color.white;
         }
     }
 
