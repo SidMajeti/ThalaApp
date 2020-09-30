@@ -72,7 +72,7 @@ public class Purchaser : MonoBehaviour, IStoreListener
                 Debug.Log(System.DateTime.Now.ToOADate());
                 Debug.Log("TimeStamp when user purchased item");
                 Debug.Log(tstamp);
-                if (System.DateTime.Now.ToOADate() - tstamp >= 0.001)
+                if (System.DateTime.Now.ToOADate() - tstamp >= 1)
                 {
                     InitializePurchasing();
                 }
