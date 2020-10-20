@@ -30,7 +30,7 @@ public class AnimFuncs : MonoBehaviour
     AndroidJavaObject jc;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         m_Animator = gameObject.GetComponent<Animator>();
         start = start.GetComponent<Button>();
@@ -52,8 +52,7 @@ public class AnimFuncs : MonoBehaviour
             m_Animator.SetBool(parameters[i].name, false);
         }
 #if UNITY_IOS
-        while(IOSIsPlaying())
-            IOSStopSound();
+        IOSStopSound();
 #endif
 #if UNITY_ANDROID
         while(jc.Call<bool>("isPlaying"))
@@ -79,8 +78,7 @@ public class AnimFuncs : MonoBehaviour
             start.GetComponent<RectTransform>().sizeDelta = new Vector2(159, 186);
             start.GetComponent<Image>().sprite = playImage;
 #if UNITY_IOS
-            while (IOSIsPlaying())
-                IOSStopSound();
+           IOSStopSound();
 #endif
 #if UNITY_ANDROID
             while(jc.Call<bool>("isPlaying"))

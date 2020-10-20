@@ -9,9 +9,9 @@ public class LoadingCircle : MonoBehaviour
     private float rotateSpeed = 200f;
     public Image circle;
     public Image lCircle;
-    public Canvas mainCanvas;
+    public GameObject mainCanvas;
 
-    void Start()
+    void Awake()
     {
         var tempColor = circle.color;
         var tempColor1 = lCircle.color;

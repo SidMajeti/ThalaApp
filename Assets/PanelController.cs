@@ -11,7 +11,7 @@ public class PanelController : MonoBehaviour
     public Button settings;
     public Button backToPlay;// Start is called before the first frame update
     Animator animator;
-    void Start()
+    void Awake()
     {
         //playPanel.gameObject.SetActive(true);
         //settingsPanel.gameObject.SetActive(false);

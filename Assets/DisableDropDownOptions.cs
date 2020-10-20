@@ -9,7 +9,7 @@ public class DisableDropDownOptions : MonoBehaviour
     public Dropdown thalaDropDown;
     Dropdown kalaiDropdown;
 
-    void Start()
+    void Awake()
     {
         kalaiDropdown = GetComponent<Dropdown>();
     }
@@ -24,7 +24,7 @@ public class DisableDropDownOptions : MonoBehaviour
         }
         else if(kalaiDropdown.options.Count <= 1 && thalaDropDown.value == 1)
         {
-            Debug.Log("Entered");
+            //Debug.Log("Entered");
             kalaiDropdown.options.Add(new Dropdown.OptionData(){text = "2nd Kalai"});
         }
     }

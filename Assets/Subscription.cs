@@ -20,7 +20,7 @@ public class Subscription : MonoBehaviour
         GameObject b = button.gameObject;
         b.SetActive(false);
         panel.gameObject.SetActive(false);
-        Debug.Log("OnPurchase is called");
+        //Debug.Log("OnPurchase is called");
     }
 }
 

@@ -18,10 +18,10 @@ public class OnSubscribe : MonoBehaviour
     public GameObject handAnim;
     Animator animator;
     AnimatorControllerParameter[] parameters;
-    public Canvas mainCanvas;
+    public GameObject mainCanvas;
     AndroidJavaObject jc;
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         b = b.GetComponent<Button>();
         b.onClick.AddListener(ActionOnClick);
@@ -34,6 +34,9 @@ public class OnSubscribe : MonoBehaviour
 
     void ActionOnClick()
     {
+#if UNITY_ANDROID
+        jc = animator.GetComponent<InstatiateGlobalVars>().GetPluginJavaClass();
+#endif
         animator.SetBool("StopAnim", true);
         for (int i = 0; i < parameters.Length - 2; i++)
         {
@@ -43,8 +46,7 @@ public class OnSubscribe : MonoBehaviour
         animator.GetComponent<AnimFuncs>().start.GetComponent<Image>().color = Color.white;
         animator.GetComponent<AnimFuncs>().start.GetComponent<Image>().sprite = animator.GetComponent<AnimFuncs>().playImage;
 #if UNITY_IOS
-        while (IOSIsPlaying())
-            IOSStopSound();
+        IOSStopSound();
 #endif
 #if UNITY_ANDROID
             while(jc.Call<bool>("isPlaying"))

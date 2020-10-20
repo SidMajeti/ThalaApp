@@ -6,6 +6,8 @@
     AVAudioPlayerNode *audioPlayerNode;
     AVAudioFile *audioFileMainClick;
     AVAudioEngine *audioEngine;
+//    AVAudioSession *audioSession;
+    NSURL *soundFileURL;
 }
 @end
 
@@ -16,6 +18,7 @@ static SoundPlayer *_sharedInstance;
 double firstime = 0;
 float currSpeed = 0.0f;
 int loopcount = 0;
+bool isStopped = false;
 
 +(SoundPlayer*) sharedInstance
 {
@@ -36,10 +39,11 @@ int loopcount = 0;
 -(void)initSoundPlayer:(NSString*) soundFilePath
 {
     [[AVAudioSession sharedInstance]
-    setCategory: AVAudioSessionCategoryPlayback
-          error: nil];
+     setCategory: AVAudioSessionCategoryPlayback error:nil];
+
+    [[AVAudioSession sharedInstance] setActive:YES error:nil];
     
-    NSURL *soundFileURL = [NSURL fileURLWithPath:soundFilePath];
+    soundFileURL = [NSURL fileURLWithPath:soundFilePath];
     audioFileMainClick = [[AVAudioFile alloc] initForReading:soundFileURL error:nil];
             
     
@@ -53,6 +57,25 @@ int loopcount = 0;
     [audioEngine prepare];
     
     [audioEngine startAndReturnError:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleInterruption:) name:AVAudioSessionInterruptionNotification object:nil];
+}
+
+-(void) handleInterruption: (NSNotification*) notification{
+    NSDictionary *interuptionDict = notification.userInfo;
+    NSInteger interuptionType = [[interuptionDict valueForKey:AVAudioSessionInterruptionTypeKey] integerValue];
+    switch (interuptionType) {
+        case AVAudioSessionInterruptionTypeBegan:
+//            NSLog(@"Audio Session Interruption case started.");
+            [audioEngine pause];
+            [audioPlayerNode stop];
+            break;
+
+        case AVAudioSessionInterruptionTypeEnded:
+//            NSLog(@"Audio Session Interruption case ended.");
+            [audioEngine startAndReturnError:nil];
+            break;
+    }
 }
 
 -(AVAudioPCMBuffer*)generateBuffer:(float) bpm{
@@ -89,9 +112,9 @@ int loopcount = 0;
     [regBuffer setFrameLength:beatLength];
     
     for(int i = 0; i < [[audioFileMainClick processingFormat] channelCount]; i++){
-        memcpy(khandaBuffer.floatChannelData[i] + [_sharedInstance mod: -displacement :khandaBuffer.frameLength], regBuffer.floatChannelData[i] + int(1000*pow(bpm/75.0,0.5)), regBuffer.frameLength - int(1000*pow(bpm/75.0,0.5)));
-        memcpy(khandaBuffer.floatChannelData[i] + [_sharedInstance mod:(regBuffer.frameLength - displacement) :khandaBuffer.frameLength], regBuffer.floatChannelData[i] + int(2000*pow(bpm/75.0,0.5)), int(regBuffer.frameLength/2.0));
-        memcpy(khandaBuffer.floatChannelData[i] +  [_sharedInstance mod:(int(1.5 * 48000 * 60.0 / bpm) - displacement) :khandaBuffer.frameLength], regBuffer.floatChannelData[i] + int(2000*pow(bpm/75.0,0.5)), regBuffer.frameLength - int(2000*pow(bpm/75.0,0.5)));
+        memcpy(khandaBuffer.floatChannelData[i] + [_sharedInstance mod: -displacement :khandaBuffer.frameLength], regBuffer.floatChannelData[i], regBuffer.frameLength);
+        memcpy(khandaBuffer.floatChannelData[i] + [_sharedInstance mod:(regBuffer.frameLength - displacement) :khandaBuffer.frameLength], regBuffer.floatChannelData[i] + int(1500*pow(bpm/75.0,0.5)), int(regBuffer.frameLength/2.0));
+        memcpy(khandaBuffer.floatChannelData[i] +  [_sharedInstance mod:(int(1.5 * 48000 * 60.0 / bpm) - displacement) :khandaBuffer.frameLength], regBuffer.floatChannelData[i], regBuffer.frameLength);
     }
     return khandaBuffer;
 }
@@ -111,7 +134,7 @@ int loopcount = 0;
     [regBuffer setFrameLength:beatLength];
     
     for(int i = 0; i < [[audioFileMainClick processingFormat] channelCount]; i++){
-        memcpy(misraBuffer.floatChannelData[i] + [_sharedInstance mod:-displacement :misraBuffer.frameLength], regBuffer.floatChannelData[i] + int(2000*pow(bpm/90.0,2)), int(0.5 * regBuffer.frameLength));
+        memcpy(misraBuffer.floatChannelData[i] + [_sharedInstance mod:-displacement :misraBuffer.frameLength], regBuffer.floatChannelData[i] + int(1500*pow(bpm/75.0,0.5)), int(0.5 * regBuffer.frameLength));
         memcpy(misraBuffer.floatChannelData[i] + [_sharedInstance mod:(int(0.5 * 48000 * 60.0 / bpm) -displacement) :misraBuffer.frameLength], regBuffer.floatChannelData[i], regBuffer.frameLength);
         memcpy(misraBuffer.floatChannelData[i] + [_sharedInstance mod:(int(1.5 * 48000 * 60.0 / bpm) -displacement) :misraBuffer.frameLength] , regBuffer.floatChannelData[i], regBuffer.frameLength);
         memcpy(misraBuffer.floatChannelData[i] +  [_sharedInstance mod:(int(2.5 * 48000 * 60.0 / bpm) - displacement) :misraBuffer.frameLength], regBuffer.floatChannelData[i], regBuffer.frameLength);
@@ -121,6 +144,7 @@ int loopcount = 0;
 
 
 -(void)playSound:(float) speed :(NSString*) tag :(int)khandaCount :(int)misraCount{
+    isStopped = false;
     loopcount = 0;
     currSpeed = speed;
     dispatch_time_t delay;
@@ -135,43 +159,45 @@ int loopcount = 0;
     dispatch_after(delay, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         AVAudioPCMBuffer *buffer;
         if(khandaCount == 1){
-            NSLog(@"Khanda1");
+//            NSLog(@"Khanda1");
             buffer = [_sharedInstance generateKhandaBuffer:speed dis:0];
         }
         else if(khandaCount == 2){
-            NSLog(@"Khanda2");
+//            NSLog(@"Khanda2");
             buffer = [_sharedInstance generateKhandaBuffer:speed dis:int(48000 * 60.0 / speed)];
         }
         else if(khandaCount == 3){
-            NSLog(@"Khanda3");
+//            NSLog(@"Khanda3");
             buffer = [_sharedInstance generateKhandaBuffer:speed dis:int(1.5 * 48000 * 60.0 / speed)];
         }
         else if(misraCount == 1){
-            NSLog(@"Misra1");
+//            NSLog(@"Misra1");
             buffer = [_sharedInstance generateMisraBuffer:speed dis:0];
         }
         else if(misraCount == 2){
-            NSLog(@"Misra2");
+//            NSLog(@"Misra2");
             buffer = [_sharedInstance generateMisraBuffer:speed dis:int(0.5*48000 * 60.0 / speed)];
         }
         else if(misraCount == 3){
-            NSLog(@"Misra3");
+//            NSLog(@"Misra3");
             buffer = [_sharedInstance generateMisraBuffer:speed dis:int(1.5 * 48000 * 60.0 / speed)];
         }
         else if(misraCount == 4){
-            NSLog(@"Misra4");
+//            NSLog(@"Misra4");
             //have to multiply float before due to loss of precision
             buffer = [_sharedInstance generateMisraBuffer:speed dis:int(2.5 * 48000 * 60.0 / speed)];
         }
         else
             buffer = [_sharedInstance generateBuffer:speed];
-        if(audioEngine.isRunning){
-            if ([audioPlayerNode isPlaying]) {
-                [audioPlayerNode scheduleBuffer:buffer atTime:nil options:AVAudioPlayerNodeBufferInterrupts completionHandler:nil];
-            } else {
-                [audioPlayerNode play];
+        if(!isStopped){
+            if(audioEngine.isRunning){
+                if ([audioPlayerNode isPlaying]) {
+                    [audioPlayerNode scheduleBuffer:buffer atTime:nil options:AVAudioPlayerNodeBufferInterrupts completionHandler:nil];
+                } else {
+                    [audioPlayerNode play];
+                }
+                [audioPlayerNode scheduleBuffer:buffer atTime:nil options: AVAudioPlayerNodeBufferLoops completionHandler:nil];
             }
-            [audioPlayerNode scheduleBuffer:buffer atTime:nil options: AVAudioPlayerNodeBufferLoops completionHandler:nil];
         }
     });
     
@@ -184,6 +210,7 @@ int loopcount = 0;
     if([audioEngine isRunning]){
         [audioPlayerNode stop];
     }
+    isStopped = true;
 }
 
 -(float)getSpeed{
@@ -212,17 +239,42 @@ int loopcount = 0;
     return loopcount;
 }
 
+-(void) stopEngine{
+    [audioEngine pause];
+    [audioPlayerNode stop];
+}
+
+-(void) restartEngine{
+    [audioEngine startAndReturnError:nil];
+}
+
+-(void) showNativeAlert: (NSString*) title :(NSString*) msg :(NSString*) b1
+{
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:msg preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:b1 style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+    }];
+    [alertController addAction:okAction];
+    [[[[UIApplication sharedApplication] keyWindow] rootViewController] presentViewController:alertController animated:YES completion:nil];
+}
+
 
 @end
 
 extern "C"
 {
+    void stopAudioEngine(){
+        [[SoundPlayer sharedInstance] stopEngine];
+    }
+    void restartAudioEngine(){
+        [[SoundPlayer sharedInstance] restartEngine];
+    }
     void InitSPlayer(char* soundFilePath){
         [[SoundPlayer sharedInstance] initSoundPlayer:[NSString stringWithUTF8String:soundFilePath]];
     }
-//    void IOSChangeSpeed(float speed){
-//        [[SoundPlayer sharedInstance] changeSpeed:speed];
-//    }
+
+    void showNativeAlert(char* title, char *msg, char *b1){
+        [[SoundPlayer sharedInstance] showNativeAlert:[NSString stringWithUTF8String:title] :[NSString stringWithUTF8String:msg]  :[NSString stringWithUTF8String:b1] ];
+    }
     void IOSMuteSound(){
         [[SoundPlayer sharedInstance] muteSound];
     }

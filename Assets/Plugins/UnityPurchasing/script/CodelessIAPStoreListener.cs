@@ -1,6 +1,5 @@
 #if UNITY_PURCHASING || UNITY_UNIFIED_IAP
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -21,10 +20,6 @@ namespace UnityEngine.Purchasing
         protected IExtensionProvider extensions;
         protected ProductCatalog catalog;
 
-        public static SubscriptionInfo info;
-
-        public static bool isSubscribed;
-
         // Allows outside sources to know whether the full initialization has taken place.
         public static bool initializationComplete;
 
@@ -37,7 +32,7 @@ namespace UnityEngine.Purchasing
             }
         }
 
-        public static void InitializePurchasing()
+        private static void InitializePurchasing()
         {
             StandardPurchasingModule module = StandardPurchasingModule.Instance();
             module.useFakeStoreUIMode = FakeStoreUIMode.StandardUser;
@@ -157,119 +152,11 @@ namespace UnityEngine.Purchasing
             initializationComplete = true;
             this.controller = controller;
             this.extensions = extensions;
+
             foreach (var button in activeButtons)
             {
                 button.UpdateText();
             }
-
-            IAppleExtensions m_AppleExtensions = extensions.GetExtension<IAppleExtensions>();
-            Dictionary<string, string> introductory_info_dict = m_AppleExtensions.GetIntroductoryPriceDictionary();
-
-            Debug.Log("Available items:");
-            foreach (var item in controller.products.all)
-            {
-                if (item.availableToPurchase)
-                {
-                    Debug.Log(string.Join(" - ",
-                        new[]
-                        {
-                        item.metadata.localizedTitle,
-                        item.metadata.localizedDescription,
-                        item.metadata.isoCurrencyCode,
-                        item.metadata.localizedPrice.ToString(),
-                        item.metadata.localizedPriceString,
-                        item.transactionID,
-                        item.receipt
-                        }));
-                // this is the usage of SubscriptionManager class
-                    if (item.receipt != null) {
-                        if (item.definition.type == ProductType.Subscription) {
-                            if (checkIfProductIsAvailableForSubscriptionManager(item.receipt)) {
-                                string intro_json = (introductory_info_dict == null || !introductory_info_dict.ContainsKey(item.definition.storeSpecificId)) ? null : introductory_info_dict[item.definition.storeSpecificId];
-                                SubscriptionManager p = new SubscriptionManager(item, intro_json);
-                                info = p.getSubscriptionInfo();
-                                if (info.isSubscribed().ToString().Equals("True"))
-                                {
-                                    isSubscribed = true;
-                                }
-                                Debug.Log("product id is: " + info.getProductId());
-                                Debug.Log("purchase date is: " + info.getPurchaseDate());
-                                Debug.Log("subscription next billing date is: " + info.getExpireDate());
-                                Debug.Log("is subscribed? " + info.isSubscribed().ToString());
-                                Debug.Log("is expired? " + info.isExpired().ToString());
-                                Debug.Log("is cancelled? " + info.isCancelled());
-                                Debug.Log("product is in free trial peroid? " + info.isFreeTrial());
-                                Debug.Log("product is auto renewing? " + info.isAutoRenewing());
-                                Debug.Log("subscription remaining valid time until next billing date is: " + info.getRemainingTime());
-                                Debug.Log("is this product in introductory price period? " + info.isIntroductoryPricePeriod());
-                                Debug.Log("the product introductory localized price is: " + info.getIntroductoryPrice());
-                                Debug.Log("the product introductory price period is: " + info.getIntroductoryPricePeriod());
-                                Debug.Log("the number of product introductory price period cycles is: " + info.getIntroductoryPricePeriodCycles());
-                            } else {
-                                Debug.Log("This product is not available for SubscriptionManager class, only products that are purchase by 1.19+ SDK can use this class.");
-                            }
-                        } else {
-                            Debug.Log("the product is not a subscription product");
-                        }
-                    } else {
-                        Debug.Log("the product should have a valid receipt");
-                    }
-                }
-            }
-
-        }
-
-        private bool checkIfProductIsAvailableForSubscriptionManager(string receipt)
-        {
-            var receipt_wrapper = (Dictionary<string, object>)MiniJson.JsonDecode(receipt);
-            if (!receipt_wrapper.ContainsKey("Store") || !receipt_wrapper.ContainsKey("Payload"))
-            {
-                Debug.Log("The product receipt does not contain enough information");
-                return false;
-            }
-            var store = (string)receipt_wrapper["Store"];
-            var payload = (string)receipt_wrapper["Payload"];
-
-            if (payload != null)
-            {
-                switch (store)
-                {
-                    case GooglePlay.Name:
-                        {
-                            var payload_wrapper = (Dictionary<string, object>)MiniJson.JsonDecode(payload);
-                            if (!payload_wrapper.ContainsKey("json"))
-                            {
-                                Debug.Log("The product receipt does not contain enough information, the 'json' field is missing");
-                                return false;
-                            }
-                            var original_json_payload_wrapper = (Dictionary<string, object>)MiniJson.JsonDecode((string)payload_wrapper["json"]);
-                            if (original_json_payload_wrapper == null || !original_json_payload_wrapper.ContainsKey("developerPayload"))
-                            {
-                                Debug.Log("The product receipt does not contain enough information, the 'developerPayload' field is missing");
-                                return false;
-                            }
-                            var developerPayloadJSON = (string)original_json_payload_wrapper["developerPayload"];
-                            var developerPayload_wrapper = (Dictionary<string, object>)MiniJson.JsonDecode(developerPayloadJSON);
-                            if (developerPayload_wrapper == null || !developerPayload_wrapper.ContainsKey("is_free_trial") || !developerPayload_wrapper.ContainsKey("has_introductory_price_trial"))
-                            {
-                                Debug.Log("The product receipt does not contain enough information, the product is not purchased using 1.19 or later");
-                                return false;
-                            }
-                            return true;
-                        }
-                    case AppleAppStore.Name:
-                    case AmazonApps.Name:
-                    case MacAppStore.Name:
-                        {
-                            return true;
-                        }
-                    default:
-                        {
-                            return false;
-                        }
-                }
-            }
-            return false;
         }
 
         public void OnInitializeFailed(InitializationFailureReason error)

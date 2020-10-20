@@ -11,7 +11,7 @@ public class SettingsTransition : MonoBehaviour
     Animator animator;
     bool isOpen;
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         settings = settings.GetComponent<Button>();
         settings.onClick.AddListener(IsOpen);

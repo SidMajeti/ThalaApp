@@ -38,7 +38,7 @@ public class AdjustSpeed : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     bool isPressed;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         //m_Animator.speed = animspeed;
         QualitySettings.vSyncCount = 0;
@@ -72,7 +72,7 @@ public class AdjustSpeed : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             beats = float.Parse(val);
         }
 
-        if (beats > 150.0f || beats < 45.0f)
+        if (beats > 150.0f || beats < 50.0f)
         {
             inputField.ActivateInputField();
         }
@@ -99,7 +99,7 @@ public class AdjustSpeed : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
         else if (EventSystem.current.currentSelectedGameObject.name == "DecreaseSpeed")
         {
-            if (beats > 45.0f)
+            if (beats > 50.0f)
             {
                 beats -= 1;
                 ChangeSpeed(Convert.ToString(beats));

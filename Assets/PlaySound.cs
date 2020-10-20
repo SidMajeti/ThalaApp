@@ -65,7 +65,7 @@ public class PlaySound : StateMachineBehaviour
                 else if (animator.GetBool("StartMisra"))
                 {
                     if (stateInfo.IsTag("MisraTag1")) {
-                        Debug.Log("Misra1 gets called");
+                        //Debug.Log("Misra1 gets called");
                         jc.Call("play", "MisraTag1");
                     }
                     else if (stateInfo.IsTag("MisraTag2")) { jc.Call("play", "MisraTag2"); }
@@ -86,7 +86,7 @@ public class PlaySound : StateMachineBehaviour
             if (!isMuted && (!isPlaying || (beats != currspeed)) && !inputField.isFocused)
             {
                 if(isPlaying && currspeed != beats) {
-                    Debug.Log("Sound is stopped");
+                    //Debug.Log("Sound is stopped");
                     IOSStopSound();
                 }
                 if (animator.GetBool("StartMisra"))

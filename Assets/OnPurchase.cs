@@ -7,7 +7,7 @@ public class OnPurchase : MonoBehaviour
 {
     public Button subsButton;
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         subsButton = subsButton.GetComponent<Button>();
 

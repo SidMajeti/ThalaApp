@@ -17,10 +17,9 @@ public class InstatiateGlobalVars : MonoBehaviour
     AndroidJavaClass jc;
     AndroidJavaObject jcInstance;
 #endif
-    void Start()
+    void Awake()
     {
-        //QualitySettings.vSyncCount = 0;
-        //Application.targetFrameRate = 60;
+        Application.runInBackground = false;
 #if UNITY_ANDROID
             javaClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
             javaObject = javaClass.GetStatic<AndroidJavaObject>("currentActivity");

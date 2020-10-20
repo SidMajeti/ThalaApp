@@ -20,7 +20,7 @@ public class InputFieldScript : MonoBehaviour
 
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         inputField = inputField.GetComponent<TMP_InputField>();
         m_Animator = handAnim.GetComponent<Animator>();
@@ -37,7 +37,7 @@ public class InputFieldScript : MonoBehaviour
             beats = float.Parse(val);
         }
 
-        if (beats > 150.0f || beats < 45.0f)
+        if (beats > 150.0f || beats < 50.0f)
         {
             inputField.ActivateInputField();
         }

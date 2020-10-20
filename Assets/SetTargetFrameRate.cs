@@ -5,7 +5,7 @@ using UnityEngine;
 public class SetTargetFrameRate : MonoBehaviour
 {
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         QualitySettings.vSyncCount = 0;
         //setting number of frames manually for target frame rate

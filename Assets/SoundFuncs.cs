@@ -23,7 +23,7 @@ public class SoundFuncs : MonoBehaviour
     public bool mute = false;
     AndroidJavaObject jc;
     public Canvas canvas;
-    void Start()
+    void Awake()
     {
         volume = volume.GetComponent<Button>();
         volume.onClick.AddListener(TaskOnClick);
