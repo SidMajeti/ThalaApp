@@ -43,7 +43,15 @@ public class PlaySound : StateMachineBehaviour
         //Debug.Log(currentTime - pastTime);
         //animator.GetComponent<GetTime>().setTime(currentTime);
         isMuted = animator.GetComponent<SoundFuncs>().mute;
-        inputField = animator.GetComponent<SetUpScene>().inputField;
+        bool isSubscribed = animator.GetComponent<AnimFuncs>().canvas.GetComponent<Purchaser>().isSubscribed;
+        if (isSubscribed)
+        {
+            inputField = animator.GetComponent<SetUpScene>().inputField2;
+        }
+        else
+        {
+            inputField = animator.GetComponent<SetUpScene>().inputField;
+        }
         beats = float.Parse(inputField.text);
 #if UNITY_ANDROID
             jc = animator.GetComponent<InstatiateGlobalVars>().GetPluginJavaClass();
@@ -89,20 +97,21 @@ public class PlaySound : StateMachineBehaviour
                     //Debug.Log("Sound is stopped");
                     IOSStopSound();
                 }
-                if (animator.GetBool("StartMisra"))
-                {
-                    if (stateInfo.IsTag("MisraTag1")) { IOSPlaySound(beats, "MisraTag", 0, 1); }
-                    else if (stateInfo.IsTag("MisraTag2")) { IOSPlaySound(beats, "MisraTag", 0, 2); }
-                    else if(stateInfo.IsTag("MisraTag3")) {IOSPlaySound(beats, "MisraTag", 0, 3); }
-                    else { IOSPlaySound(beats, "MisraTag", 0, 4); }
-                }
-                else if(animator.GetBool("StartKhandaChapu"))
-                {
-                    if (stateInfo.IsTag("KhandaTag1")) {IOSPlaySound(beats, "KhandaTag", 1,0); }
-                    else if(stateInfo.IsTag("KhandaTag2")) { IOSPlaySound(beats, "KhandaTag", 2,0); }
-                    else { IOSPlaySound(beats, "KhandaTag", 3, 0); }
-                }
-                else { IOSPlaySound(beats, "", 0, 0);}
+                //if (animator.GetBool("StartMisra"))
+                //{
+                //    if (stateInfo.IsTag("MisraTag1")) { IOSPlaySound(beats, "MisraTag", 0, 1); }
+                //    else if (stateInfo.IsTag("MisraTag2")) { IOSPlaySound(beats, "MisraTag", 0, 2); }
+                //    else if(stateInfo.IsTag("MisraTag3")) {IOSPlaySound(beats, "MisraTag", 0, 3); }
+                //    else { IOSPlaySound(beats, "MisraTag", 0, 4); }
+                //}
+                //else if(animator.GetBool("StartKhandaChapu"))
+                //{
+                //    if (stateInfo.IsTag("KhandaTag1")) {IOSPlaySound(beats, "KhandaTag", 1,0); }
+                //    else if(stateInfo.IsTag("KhandaTag2")) { IOSPlaySound(beats, "KhandaTag", 2,0); }
+                //    else { IOSPlaySound(beats, "KhandaTag", 3, 0); }
+                //}
+                //else { IOSPlaySound(beats, "", 0, 0);}
+                IOSPlaySound(beats, "", 0, 0);
             }
 #endif
 

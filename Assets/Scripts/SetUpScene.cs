@@ -7,6 +7,8 @@ using UnityEngine.SceneManagement;
 public class SetUpScene : MonoBehaviour
 {
     public TMP_InputField inputField;
+    public TMP_InputField inputField2;
+    public Canvas canvas;
     //set up controls 
     void Start()
     {
@@ -18,7 +20,6 @@ public class SetUpScene : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-       
     }
     
 }

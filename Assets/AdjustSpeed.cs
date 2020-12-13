@@ -47,6 +47,7 @@ public class AdjustSpeed : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         incrSpeed = incrSpeed.GetComponent<Button>();
         decrSpeed = decrSpeed.GetComponent<Button>();
         inputField = inputField.GetComponent<TMP_InputField>();
+        inputField.contentType = TMP_InputField.ContentType.IntegerNumber;
         m_Animator = handAnim.GetComponent<Animator>();
         //incrSpeed.onClick.AddListener(TaskOnClick);
         //decrSpeed.onClick.AddListener(TaskOnClick);
@@ -87,6 +88,7 @@ public class AdjustSpeed : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void TaskOnClick()
     {
+        Debug.Log("Getting pressed!");
         beats = float.Parse(inputField.text);
         if (EventSystem.current.currentSelectedGameObject.name == "IncreaseSpeed")
         {

@@ -17,30 +17,58 @@ public class Purchaser : MonoBehaviour, IStoreListener
     private static extern void stopAudioEngine();
     [DllImport("__Internal")]
     private static extern void restartAudioEngine();
+    [DllImport("__Internal")]
+    private static extern void iCloudKV_Synchronize();
+
+    [DllImport("__Internal")]
+    private static extern void iCloudKV_SetLong(string key, long value);
+
+    [DllImport("__Internal")]
+    private static extern void iCloudKV_SetFloat(string key, float value);
+
+    [DllImport("__Internal")]
+    private static extern long iCloudKV_GetLong(string key);
+
+    [DllImport("__Internal")]
+    private static extern float iCloudKV_GetFloat(string key);
+
+    [DllImport("__Internal")]
+    private static extern void iCloudKV_Reset();
 #endif
 
     ITransactionHistoryExtensions m_TransactionHistoryExtensions;
     IStoreController m_StoreController;          // The Unity Purchasing system.
     IExtensionProvider m_StoreExtensionProvider; // The store-specific Purchasing subsystems.
 
-    public static string kProductIDSubscription = "com.sidmajeti.thala.in_app_subs";
-
     // Apple App Store-specific product identifier for the subscription product.
-    private static string kProductNameAppleSubscription = "com.sidmajeti.thala.in_app_subs";
+    private static string kProductNameAppleSubscription = "com.sidmajeti.thala.in_app_subs_apple";
 
     // Google Play Store-specific product identifier subscription product.
     private static string kProductNameGooglePlaySubscription = "com.sidmajeti.thala.in_app_subs";
 
+#if UNITY_IOS
+    public static string kProductIDSubscription = kProductNameAppleSubscription;
+#endif
+
+#if UNITY_ANDROID
+    public static string kProductIDSubscription = kProductNameGooglePlaySubscription;
+#endif
+
     public Dropdown thalaDropdown;
     public GameObject panel;
     public Button subsButton;
+    public GameObject settingsPanel;
+    public GameObject fullSettingsPanel;
+    public Animator smallSettings;
+    public Animator fullSettings;
+    public GameObject playPanel;
 
     double tstamp;
     bool wasPaused;
 
     public bool loadCircle;
 
-    bool isSubscribed;
+    public bool isSubscribed = false;
 
     public void OnInitialized(IStoreController controller, IExtensionProvider extensions)
     {
@@ -73,34 +101,63 @@ public class Purchaser : MonoBehaviour, IStoreListener
                 //        item.receipt
                 //    }));
                 // this is the usage of SubscriptionManager class
+                Debug.Log("Entered onInitialized");
                 if (item.receipt != null)
                 {
                     if (item.definition.type == ProductType.Subscription)
                     {
-                        if (checkIfProductIsAvailableForSubscriptionManager(item.receipt))
-                        {
-                            string intro_json = (introductory_info_dict == null || !introductory_info_dict.ContainsKey(item.definition.storeSpecificId)) ? null : introductory_info_dict[item.definition.storeSpecificId];
-                            SubscriptionManager p = new SubscriptionManager(item, intro_json);
-                            SubscriptionInfo info = p.getSubscriptionInfo();
-                            if (info.isSubscribed().ToString().Equals("True"))
-                            {
-                                // set timestamp each time user is subscribed and you have reinitialized/requeried
-                                tstamp = System.DateTime.Now.ToOADate();
+                        //if (checkIfProductIsAvailableForSubscriptionManager(item.receipt))
+                        //{
+                        //Debug.Log("Entered isInitialized");
+                        //    string intro_json = (introductory_info_dict == null || !introductory_info_dict.ContainsKey(item.definition.storeSpecificId)) ? null : introductory_info_dict[item.definition.storeSpecificId];
+                        //    SubscriptionManager p = new SubscriptionManager(item, intro_json);
+                        //    SubscriptionInfo info = p.getSubscriptionInfo();
+                        //    if (info.isSubscribed().ToString().Equals("True"))
+                        //    {
+                        //        // set timestamp each time user is subscribed and you have reinitialized/requeried
+                        //        tstamp = System.DateTime.Now.ToOADate();
 
-                                if (subsButton.gameObject.activeSelf)
-                                {
-                                    List<string> options = new List<string> { "Adi Thalam", "Khanda Chapu Thalam", "Misra Chapu Thalam", "Ata Thalam" };
-                                    thalaDropdown.AddOptions(options);
-                                    subsButton.gameObject.SetActive(false);
-                                    panel.gameObject.SetActive(false);
-                                }
-                                isSubscribed = true;
-                                //allow user to access full app
-                            }
-                        }
-                        else
+                        //        if (subsButton.gameObject.activeSelf)
+                        //        {
+                        //            List<string> options = new List<string> { "Adi Thalam", "Khanda Chapu Thalam", "Misra Chapu Thalam", "Ata Thalam" };
+                        //            thalaDropdown.AddOptions(options);
+                        //            subsButton.gameObject.SetActive(false);
+                        //            panel.gameObject.SetActive(false);
+                        //        }
+                        //        isSubscribed = true;
+                        //        //allow user to access full app
+                        //    }
+                        //}
+                        //else
+                        //{
+                        //    //Debug.Log("This product is not available for SubscriptionManager class, only products that are purchase by 1.19+ SDK can use this class.");
+                        //}
+
+                        long endDate = iCloudKV_GetLong("subscriptionEndDate");
+                        Debug.Log("endDate: " + endDate);
+                        if(DateTime.UtcNow.Ticks < endDate)
                         {
-                            //Debug.Log("This product is not available for SubscriptionManager class, only products that are purchase by 1.19+ SDK can use this class.");
+                            //set timestamp each time user is subscribed and you have reinitialized / requeried
+                            tstamp = System.DateTime.Now.ToOADate();
+
+                            if (subsButton.gameObject.activeSelf)
+                            {
+                                List<string> options = new List<string> { "Adi Thalam", "Khanda Chapu Thalam", "Misra Chapu Thalam", "Ata Thalam" };
+                                thalaDropdown.AddOptions(options);
+                                subsButton.gameObject.SetActive(false);
+                                panel.gameObject.SetActive(false);
+                            }
+                            isSubscribed = true;
+                            //allow user to access full app
+                            fullSettingsPanel.SetActive(true);
+                            settingsPanel.SetActive(false);
+
+                            if (smallSettings.GetBool("isOpen"))
+                            {
+                                fullSettings.SetBool("isOpen", true);
+                                smallSettings.SetBool("isOpen", false);
+                            }
+
                         }
                     }
                     else
@@ -184,7 +241,12 @@ public class Purchaser : MonoBehaviour, IStoreListener
         // through ProcessPurchase or OnPurchaseFailed asynchronously.
         // Notice how we use the general product identifier in spite of this ID being mapped to
         // custom store-specific identifiers above.
-        BuyProductID(kProductIDSubscription);
+#if UNITY_IOS
+        BuyProductID(kProductNameAppleSubscription);
+#endif
+#if UNITY_ANDROID
+        BuyProductID(kProductNameGooglePlaySubscription);
+#endif
     }
 
 
@@ -236,18 +298,27 @@ public class Purchaser : MonoBehaviour, IStoreListener
 
         // If we are running on an Apple device ... 
 #if UNITY_IOS
-        
-            // ... begin restoring purchases
 
-            // Fetch the Apple store-specific subsystem.
-            var apple = m_StoreExtensionProvider.GetExtension<IAppleExtensions>();
-            // Begin the asynchronous process of restoring purchases. Expect a confirmation response in 
-            // the Action<bool> below, and ProcessPurchase if there are previously purchased products to restore.
-            apple.RestoreTransactions((result) =>
-            {
-                // The first phase of restoration. If no more responses are received on ProcessPurchase then 
-                // no purchases are available to be restored.
-            }); 
+        //// ... begin restoring purchases
+
+        //long endDate = iCloudKV_GetLong("subscriptionEndDate");
+        //if (DateTime.UtcNow.Ticks < endDate)
+        //{
+        //    //set timestamp each time user is subscribed and you have reinitialized / requeried
+        //    tstamp = System.DateTime.Now.ToOADate();
+
+        //    if (subsButton.gameObject.activeSelf)
+        //    {
+        //        List<string> options = new List<string> { "Adi Thalam", "Khanda Chapu Thalam", "Misra Chapu Thalam", "Ata Thalam" };
+        //        thalaDropdown.AddOptions(options);
+        //        subsButton.gameObject.SetActive(false);
+        //        panel.gameObject.SetActive(false);
+        //    }
+        //    isSubscribed = true;
+        //    //allow user to access full app
+        //}
+
+        showNativeAlert("Restore Policy", "Make sure your iCloud is turned on for this device and the device you previously purchased the subscription on. Then, restart the app.", "OK");
 #endif
 
     }
@@ -322,6 +393,8 @@ public class Purchaser : MonoBehaviour, IStoreListener
         loadCircle = false;
         if (String.Equals(args.purchasedProduct.definition.id, kProductIDSubscription, StringComparison.Ordinal))
         {
+            smallSettings.SetBool("isOpen", false);
+            playPanel.gameObject.SetActive(true);
             if (subsButton.gameObject.activeSelf)
             {
                 //Debug.Log(string.Format("ProcessPurchase: PASS. Product: '{0}'", args.purchasedProduct.definition.id));
@@ -332,7 +405,20 @@ public class Purchaser : MonoBehaviour, IStoreListener
             }
             isSubscribed = true;
             tstamp = System.DateTime.Now.ToOADate();
-            //fill in the dropdown with values
+
+            fullSettingsPanel.SetActive(true);
+            settingsPanel.SetActive(false);
+
+            //change this value
+            int subscriptionPeriodInMonths = 3;
+            DateTime subscriptionEndDate = DateTime.UtcNow.AddMinutes(subscriptionPeriodInMonths);
+
+            //Debug.Log("Ticks: " + subscriptionEndDate.Ticks);
+            //would setting same key for every subscription be a problem? (intersecting keys??)
+            iCloudKV_SetLong("subscriptionEndDate", subscriptionEndDate.Ticks);
+            iCloudKV_Synchronize();
+            Debug.Log(iCloudKV_GetLong("subcriptionEndDate"));
+
         }
         // Or ... an unknown product has been purchased by this user. Fill in additional products here....
         else
@@ -340,6 +426,7 @@ public class Purchaser : MonoBehaviour, IStoreListener
             //Debug.Log(string.Format("ProcessPurchase: FAIL. Unrecognized product: '{0}'", args.purchasedProduct.definition.id));
         }
 
+        showNativeAlert("Warning","If you want to restore your purchases on another device, make sure your iCloud is on for this app.", "OK");
         // Return a flag indicating whether this product has completely been received, or if the application needs 
         // to be reminded of this purchase at next app launch. Use PurchaseProcessingResult.Pending when still 
         // saving purchased products to the cloud, and when that save is delayed. 
@@ -373,6 +460,7 @@ public class Purchaser : MonoBehaviour, IStoreListener
             // Begin to configure our connection to Purchasing
             InitializePurchasing();
         }
+        iCloudKV_Synchronize();
         SplashScreen.Begin();
     }
 
