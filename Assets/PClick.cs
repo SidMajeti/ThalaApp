@@ -36,23 +36,29 @@ public class PClick : MonoBehaviour, IPointerClickHandler
         {
             if(thalaDropdown.options[thalaDropdown.value].text.Equals("Sapta Thala"))
             {
-                Debug.Log("EnteredSapta");
-                List<string> options = new List<string> { "General" };
-                otherDropdown.AddOptions(options);
-                otherDropdown.value = otherDropdown.options.Count - 1;
-                otherDropdown.RefreshShownValue();
-                otherDropdown.enabled = false;
-                otherDropdown.enabled = true;
+                //Debug.Log("EnteredSapta");
+                if (otherDropdown.options[otherDropdown.value].text != "General")
+                {
+                    List<string> options = new List<string> { "General" };
+                    otherDropdown.AddOptions(options);
+                    otherDropdown.value = otherDropdown.options.Count - 1;
+                    otherDropdown.RefreshShownValue();
+                    otherDropdown.enabled = false;
+                    otherDropdown.enabled = true;
+                }
             }
             else if(thalaDropdown.options[thalaDropdown.value].text.Equals("General"))
             {
-                Debug.Log("EnteredGeneral");
-                List<string> options = new List<string> { "Sapta Thala" };
-                otherDropdown.AddOptions(options);
-                otherDropdown.value = otherDropdown.options.Count - 1;
-                otherDropdown.RefreshShownValue();
-                otherDropdown.enabled = false;
-                otherDropdown.enabled = true;
+                //Debug.Log("EnteredGeneral");
+                if (otherDropdown.options[otherDropdown.value].text != "Sapta Thala")
+                {
+                    List<string> options = new List<string> { "Sapta Thala" };
+                    otherDropdown.AddOptions(options);
+                    otherDropdown.value = otherDropdown.options.Count - 1;
+                    otherDropdown.RefreshShownValue();
+                    otherDropdown.enabled = false;
+                    otherDropdown.enabled = true;
+                }
             }
             thalaDropdown.ClearOptions();
             thalaDropdown.RefreshShownValue();

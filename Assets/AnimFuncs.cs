@@ -32,6 +32,7 @@ public class AnimFuncs : MonoBehaviour
     public Sprite playImage;
     public Sprite stopImage;
     AndroidJavaObject jc;
+    public GameObject handAnim;
 
     // Start is called before the first frame update
     void Awake()
@@ -42,27 +43,27 @@ public class AnimFuncs : MonoBehaviour
         parameters = saptaAnimator.parameters;
         isStopButton = false;
 
-        List<string> options = new List<string> { "General" };
-        thalaDropdown.AddOptions(options);
-        thalaDropdown.value = thalaDropdown.options.Count - 1;
-        thalaDropdown.RefreshShownValue();
+        //List<string> options = new List<string> { "General" };
+        //thalaDropdown.AddOptions(options);
+        //thalaDropdown.value = thalaDropdown.options.Count - 1;
+        //thalaDropdown.RefreshShownValue();
 
-        List<string> options1 = new List<string> { "Sapta Thala" };
-        saptaDropdown.AddOptions(options1);
-        saptaDropdown.value = saptaDropdown.options.Count - 1;
-        saptaDropdown.RefreshShownValue();
-
-
-        List<string> options2 = new List<string> { "Kalai" };
-        kalaiDropdown.AddOptions(options2);
-        kalaiDropdown.value = kalaiDropdown.options.Count - 1;
-        kalaiDropdown.RefreshShownValue();
+        //List<string> options1 = new List<string> { "Sapta Thala" };
+        //saptaDropdown.AddOptions(options1);
+        //saptaDropdown.value = saptaDropdown.options.Count - 1;
+        //saptaDropdown.RefreshShownValue();
 
 
-        List<string> options3 = new List<string> { "Jathi" };
-        jathiDropdown.AddOptions(options3);
-        jathiDropdown.value = jathiDropdown.options.Count - 1;
-        jathiDropdown.RefreshShownValue();
+        //List<string> options2 = new List<string> { "Kalai" };
+        //kalaiDropdown.AddOptions(options2);
+        //kalaiDropdown.value = kalaiDropdown.options.Count - 1;
+        //kalaiDropdown.RefreshShownValue();
+
+
+        //List<string> options3 = new List<string> { "Jathi" };
+        //jathiDropdown.AddOptions(options3);
+        //jathiDropdown.value = jathiDropdown.options.Count - 1;
+        //jathiDropdown.RefreshShownValue();
 
         saptaDropdown.onValueChanged.AddListener(TaskOnValueChanged);
         thalaDropdown.onValueChanged.AddListener(TaskOnValueChanged);
@@ -71,13 +72,12 @@ public class AnimFuncs : MonoBehaviour
         thalaDropdown2.onValueChanged.AddListener(TaskOnValueChanged);
         kalaiDropdown2.onValueChanged.AddListener(TaskOnValueChanged);
 #if UNITY_ANDROID
-        jc = m_Animator.GetComponent<InstatiateGlobalVars>().GetPluginJavaClass();
+        jc = handAnim.GetComponent<InstatiateGlobalVars>().GetPluginJavaClass();
 #endif
     }
 
-    void TaskOnValueChanged(int value)
+    public void TaskOnValueChanged(int value)
     {
-        //fix this logic!!
         saptaAnimator = gameObject.GetComponent<Animator>();
         int saptaParamlen;
         parameters = saptaAnimator.parameters;
@@ -97,6 +97,7 @@ public class AnimFuncs : MonoBehaviour
             saptaAnimator.SetBool(parameters[i].name, false);
         }
 
+        //setting other controller to false also
         if (saptaAnimator.runtimeAnimatorController.name.Equals("HandController"))
         {
             saptaAnimator.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("AllThalas");
@@ -129,7 +130,7 @@ public class AnimFuncs : MonoBehaviour
         {
             if (thalaDropdown2.value != 1 && kalaiDropdown2.options.Count == 2)
             {
-                Debug.Log("Entered");
+                //Debug.Log("Entered");
                 //1st kalai automatically change
                 kalaiDropdown2.value = 0;
                 //kalaiDropdown2.options.RemoveAt(1);
@@ -138,15 +139,15 @@ public class AnimFuncs : MonoBehaviour
             else if (kalaiDropdown2.options.Count <= 1 && thalaDropdown2.value == 1)
             {
                 //Debug.Log("Entered");
-                kalaiDropdown2.options.Add(new Dropdown.OptionData() { text = "2nd Kalai" });
+                kalaiDropdown2.options.Add(new Dropdown.OptionData() { text = "2" });
             }
         }
         else
         {
             if (thalaDropdown.value != 1 && kalaiDropdown.options.Count == 2)
             {
-                Debug.Log("Entered");
-                Debug.Log("CountofKalai: " + kalaiDropdown.options.Count);
+                //Debug.Log("Entered");
+                //Debug.Log("CountofKalai: " + kalaiDropdown.options.Count);
                 //1st kalai automatically change
                 kalaiDropdown.value = 0;
                 //kalaiDropdown.options.RemoveAt(1);
@@ -155,7 +156,7 @@ public class AnimFuncs : MonoBehaviour
             else if (kalaiDropdown.options.Count <= 1 && thalaDropdown.value == 1)
             {
                 //Debug.Log("Entered");
-                kalaiDropdown.options.Add(new Dropdown.OptionData() { text = "2nd Kalai" });
+                kalaiDropdown.options.Add(new Dropdown.OptionData() { text = "2" });
             }
         }
 
@@ -202,9 +203,26 @@ public class AnimFuncs : MonoBehaviour
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
             //float currentTime = Time.time * 1000;
             //Debug.Log("Time when play is pressed : " +currentTime);
-            saptaAnimator.SetBool("StopAnim", false);
 
             bool isSubscribed = canvas.GetComponent<Purchaser>().isSubscribed;
+
+            if (isSubscribed)
+            {
+                if(!((!thalaDropdown2.options[thalaDropdown2.value].text.Equals("General") && !kalaiDropdown2.options[kalaiDropdown2.value].text.Equals("Kalai"))
+                    || (!saptaDropdown.options[saptaDropdown.value].text.Equals("Sapta Thala") && !jathiDropdown.options[jathiDropdown.value].text.Equals("Jathi"))))
+                {
+                    return;
+                }
+            }
+            else
+            {
+                if (thalaDropdown.options[thalaDropdown.value].text.Equals("General") || kalaiDropdown.options[kalaiDropdown.value].text.Equals("Kalai"))
+                {
+                    return;
+                }
+            }
+
+            saptaAnimator.SetBool("StopAnim", false);
             
             if (saptaAnimator.runtimeAnimatorController.name.Equals("HandController"))
             {
@@ -220,7 +238,7 @@ public class AnimFuncs : MonoBehaviour
                     value = thalaDropdown.value;
                     valofKalai = kalaiDropdown.value + 1;
                 }
-                Debug.Log("Value" + value);
+                //Debug.Log("Value" + value);
                 saptaAnimator.SetBool(parameters[value].name, true);
                 saptaAnimator.SetInteger("KalaiNum", valofKalai);
             }

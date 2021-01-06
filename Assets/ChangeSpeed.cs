@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class ChangeSpeed : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
     bool isPressed;
     public GameObject handAnim;
-    public TMP_InputField inputField;
+    public InputField inputField;
     Animator m_Animator;
     private float beats;
 
@@ -18,7 +19,7 @@ public class ChangeSpeed : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     // Start is called before the first frame update
     void Awake()
     {
-        inputField = inputField.GetComponent<TMP_InputField>();
+        inputField = inputField.GetComponent<InputField>();
         m_Animator = handAnim.GetComponent<Animator>();
     }
 

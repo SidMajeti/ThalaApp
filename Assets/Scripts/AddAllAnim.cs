@@ -52,22 +52,24 @@
 //                controller.AddParameter(thalas.options[i].text + jathi.options[j].text, AnimatorControllerParameterType.Bool);
 //                if (i == 0)
 //                {
+//                    int counter = 1;
 //                    for (int k = 0; k < Int32.Parse(jathi.options[j].text); k++)
 //                    {
 //                        if (k == 0)
 //                        {
-//                            addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, true, ref firstState);
+//                            addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, true, ref firstState, counter);
 //                        }
 //                        else
 //                        {
-//                            addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
+//                            addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter);
 //                        }
+//                        counter += 1;
 //                    }
 
-//                    addAnim(drutham[0], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
-//                    addAnim(drutham[1], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
-//                    addAnim(drutham[0], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
-//                    addAnim(drutham[1], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
+//                    addAnim(drutham[0], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter);
+//                    addAnim(drutham[1], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter +1);
+//                    addAnim(drutham[0], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter + 2);
+//                    addAnim(drutham[1], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter + 3);
 
 //                    trans = pastState.AddTransition(firstState);
 //                    trans.exitTime = 0.8f;
@@ -78,13 +80,15 @@
 //                }
 //                else if (i == 1)
 //                {
-//                    addAnim(drutham[0], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, true, ref firstState);
-
-//                    addAnim(drutham[1], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
-
+//                    int counter = 1;
+//                    addAnim(drutham[0], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, true, ref firstState, counter);
+//                    counter += 1;
+//                    addAnim(drutham[1], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter);
+//                    counter += 1;
 //                    for (int k = 0; k < Int32.Parse(jathi.options[j].text); k++)
 //                    {
-//                        addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
+//                        addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter);
+//                        counter += 1;
 //                    }
 
 //                    trans = pastState.AddTransition(firstState);
@@ -95,28 +99,34 @@
 //                }
 //                else if (i == 2)
 //                {
+//                    int counter = 1;
 //                    for (int k = 0; k < Int32.Parse(jathi.options[j].text); k++)
 //                    {
 //                        if (k == 0)
 //                        {
-//                            addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, true, ref firstState);
+//                            addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, true, ref firstState, counter);
 //                        }
 //                        else
 //                        {
-//                            addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
+//                            addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter);
 //                        }
+//                        counter += 1;
 //                    }
-//                    addAnim(drutham[0], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
-//                    addAnim(drutham[1], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
+//                    addAnim(drutham[0], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter);
+//                    counter += 1;
+//                    addAnim(drutham[1], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter);
+//                    counter += 1;
 //                    for (int k = 0; k < Int32.Parse(jathi.options[j].text); k++)
 //                    {
 
-//                        addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
+//                        addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter);
+//                        counter += 1;
 
 //                    }
 //                    for (int k = 0; k < Int32.Parse(jathi.options[j].text); k++)
 //                    {
-//                        addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
+//                        addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter);
+//                        counter += 1;
 //                    }
 //                    trans = pastState.AddTransition(firstState);
 //                    trans.exitTime = 0.8f;
@@ -126,22 +136,27 @@
 //                }
 //                else if (i == 3)
 //                {
+//                    int counter = 1;
 //                    for (int k = 0; k < Int32.Parse(jathi.options[j].text); k++)
 //                    {
 //                        if (k == 0)
 //                        {
-//                            addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, true, ref firstState);
+//                            addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, true, ref firstState, counter);
 //                        }
 //                        else
 //                        {
-//                            addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
+//                            addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter);
 //                        }
+//                        counter += 1;
 //                    }
-//                    addAnim(drutham[0], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
-//                    addAnim(drutham[1], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
+//                    addAnim(drutham[0], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter);
+//                    counter += 1;
+//                    addAnim(drutham[1], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter);
+//                    counter += 1;
 //                    for (int k = 0; k < Int32.Parse(jathi.options[j].text); k++)
 //                    {
-//                        addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
+//                        addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter);
+//                        counter += 1;
 //                    }
 //                    trans = pastState.AddTransition(firstState);
 //                    trans.exitTime = 0.8f;
@@ -151,25 +166,28 @@
 //                }
 //                else if (i == 4)
 //                {
+//                    int counter = 1;
 //                    for (int k = 0; k < Int32.Parse(jathi.options[j].text); k++)
 //                    {
 //                        if (k == 0)
 //                        {
-//                            addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, true, ref firstState);
+//                            addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, true, ref firstState, counter);
 //                        }
 //                        else
 //                        {
-//                            addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
+//                            addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter);
 //                        }
+//                        counter += 1;
 //                    }
 //                    for (int k = 0; k < Int32.Parse(jathi.options[j].text); k++)
 //                    {
-//                        addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
+//                        addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter);
+//                        counter += 1;
 //                    }
-//                    addAnim(drutham[0], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
-//                    addAnim(drutham[1], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
-//                    addAnim(drutham[0], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
-//                    addAnim(drutham[1], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
+//                    addAnim(drutham[0], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter);
+//                    addAnim(drutham[1], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter + 1);
+//                    addAnim(drutham[0], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter + 2);
+//                    addAnim(drutham[1], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter + 3);
 //                    trans = pastState.AddTransition(firstState);
 //                    trans.exitTime = 0.8f;
 //                    trans.hasFixedDuration = true;
@@ -178,16 +196,18 @@
 //                }
 //                else if (i == 5)
 //                {
+//                    int counter = 1;
 //                    for (int k = 0; k < Int32.Parse(jathi.options[j].text); k++)
 //                    {
 //                        if (k == 0)
 //                        {
-//                            addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, true, ref firstState);
+//                            addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, true, ref firstState, counter);
 //                        }
 //                        else
 //                        {
-//                            addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
+//                            addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter);
 //                        }
+//                        counter += 1;
 //                    }
 //                    trans = pastState.AddTransition(firstState);
 //                    trans.exitTime = 0.8f;
@@ -197,20 +217,22 @@
 //                }
 //                else if (i == 6)
 //                {
+//                    int counter = 1;
 //                    for (int k = 0; k < Int32.Parse(jathi.options[j].text); k++)
 //                    {
 //                        if (k == 0)
 //                        {
-//                            addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, true, ref firstState);
+//                            addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, true, ref firstState, counter);
 //                        }
 //                        else
 //                        {
-//                            addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
+//                            addAnim(jathis[k], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter);
 //                        }
+//                        counter += 1;
 //                    }
-//                    addAnim(jathis[0], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
-//                    addAnim(drutham[0], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
-//                    addAnim(drutham[1], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState);
+//                    addAnim(jathis[0], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter);
+//                    addAnim(drutham[0], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter + 1);
+//                    addAnim(drutham[1], thalas, jathi, i, j, ref currentState, ref pastState, ref trans, ref controller, false, ref firstState, counter + 2);
 //                    trans = pastState.AddTransition(firstState);
 //                    trans.exitTime = 0.8f;
 //                    trans.hasFixedDuration = true;
@@ -222,10 +244,11 @@
 
 //    }
 
-//    static void addAnim(AnimationClip clip, Dropdown thalas, Dropdown jathi, int thalaCount, int jathiCount, ref AnimatorState currentState, ref AnimatorState pastState, ref AnimatorStateTransition trans, ref AnimatorController controller, bool isFirst, ref AnimatorState firstState)
+//    static void addAnim(AnimationClip clip, Dropdown thalas, Dropdown jathi, int thalaCount, int jathiCount, ref AnimatorState currentState, ref AnimatorState pastState, ref AnimatorStateTransition trans, ref AnimatorController controller, bool isFirst, ref AnimatorState firstState, int counter)
 //    {
 //        currentState = controller.AddMotion(clip);
 //        currentState.AddStateMachineBehaviour<PlaySound>();
+//        currentState.tag = counter.ToString();
 //        trans = pastState.AddTransition(currentState);
 //        if (isFirst)
 //        {

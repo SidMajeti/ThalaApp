@@ -18,7 +18,7 @@ public class AdjustSpeed : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     [DllImport("__Internal")]
     private static extern void IOSStopSound();
 #endif
-    public TMP_InputField inputField;
+    public InputField inputField;
     public Button incrSpeed;
     public Button decrSpeed;
     public Button exitPopUp;
@@ -46,8 +46,9 @@ public class AdjustSpeed : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         Application.targetFrameRate = 60;
         incrSpeed = incrSpeed.GetComponent<Button>();
         decrSpeed = decrSpeed.GetComponent<Button>();
-        inputField = inputField.GetComponent<TMP_InputField>();
-        inputField.contentType = TMP_InputField.ContentType.IntegerNumber;
+        inputField = inputField.GetComponent<InputField>();
+        //inputField.contentType = InputField.ContentType.IntegerNumber;
+        //inputField.keyboardType = TouchScreenKeyboardType.NumberPad;
         m_Animator = handAnim.GetComponent<Animator>();
         //incrSpeed.onClick.AddListener(TaskOnClick);
         //decrSpeed.onClick.AddListener(TaskOnClick);
@@ -88,18 +89,19 @@ public class AdjustSpeed : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void TaskOnClick()
     {
-        Debug.Log("Getting pressed!");
+        //Debug.Log("Getting pressed!");
         beats = float.Parse(inputField.text);
-        if (EventSystem.current.currentSelectedGameObject.name == "IncreaseSpeed")
+        if (EventSystem.current.currentSelectedGameObject.name == "IncreaseSpeed" || EventSystem.current.currentSelectedGameObject.name == "IncreaseSpeed2")
         {
             if (beats < 150.0f)
             {
                 beats += 1;
                 ChangeSpeed(Convert.ToString(beats));
                 inputField.text = Convert.ToString(beats);
+                //Debug.Log("Increasing speed");
             }
         }
-        else if (EventSystem.current.currentSelectedGameObject.name == "DecreaseSpeed")
+        else if (EventSystem.current.currentSelectedGameObject.name == "DecreaseSpeed" || EventSystem.current.currentSelectedGameObject.name == "DecreaseSpeed2")
         {
             if (beats > 50.0f)
             {

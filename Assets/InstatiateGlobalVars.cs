@@ -9,7 +9,7 @@ public class InstatiateGlobalVars : MonoBehaviour
     // instantiates android plugin classes
 #if UNITY_IOS
     [DllImport("__Internal")]
-    private static extern void InitSPlayer(string sFilePath);
+    private static extern void InitSPlayer(string otherSoundPath, string firstSoundPath);
 #endif
 #if UNITY_ANDROID
     AndroidJavaClass javaClass;
@@ -25,11 +25,12 @@ public class InstatiateGlobalVars : MonoBehaviour
             javaObject = javaClass.GetStatic<AndroidJavaObject>("currentActivity");
             jc = new AndroidJavaClass("com.majeti.unity.Metronome");
             jcInstance = jc.GetStatic<AndroidJavaObject>("myInstance");
-            jcInstance.Call("initSoundFile", javaObject, "snap16bit.wav");
+            jcInstance.Call("initSoundFile", javaObject, "high_bell.wav", "Rest.wav");
 #endif
 #if UNITY_IOS
-        string StreamingAssetsBundlesFolder = Path.Combine(Application.streamingAssetsPath, "snap1.wav");
-            InitSPlayer(StreamingAssetsBundlesFolder);
+        string firstSound = Path.Combine(Application.streamingAssetsPath, "high_bell.wav");
+        string otherSound = Path.Combine(Application.streamingAssetsPath, "Rest.wav");
+        InitSPlayer(otherSound, firstSound);
         #endif
     }
 

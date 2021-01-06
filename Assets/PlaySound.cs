@@ -5,13 +5,14 @@ using System.Runtime.InteropServices;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.UI;
 
 //plays sound with respect to speed
 public class PlaySound : StateMachineBehaviour
 {
 #if UNITY_IOS
     [DllImport("__Internal")]
-    private static extern void IOSPlaySound(float speed, String tag, int khandaCount, int misraCount);
+    private static extern void IOSPlaySound(float speed, String tag, int khandaCount, int misraCount, int sankeernaCount, int[] thalas, int sizeOfArr, int laghuCount, int otherCount);
     //[DllImport("__Internal")]
     //private static extern void IOSChangeSpeed(float speed);
     [DllImport("__Internal")]
@@ -27,7 +28,7 @@ public class PlaySound : StateMachineBehaviour
 
 #endif
     AudioSource audioSource;
-    TMP_InputField inputField;
+    InputField inputField;
     float secperBeat;
     AndroidJavaObject jc;
     int counter;
@@ -66,23 +67,173 @@ public class PlaySound : StateMachineBehaviour
                 }
                 if (animator.GetBool("StartKhandaChapu"))
                 {
-                    if (stateInfo.IsTag("KhandaTag1")) { jc.Call("play", "KhandaChapu1"); }
-                    else if (stateInfo.IsTag("KhandaTag3")) { jc.Call("play", "KhandaChapu3"); }
-                    else { jc.Call("play", "KhandaChapu2"); }
+                    int[] a = { };
+                    if (stateInfo.IsTag("KhandaTag1")) { jc.Call("play", "KhandaChapu1", 0, 0,a ); }
+                    else if (stateInfo.IsTag("KhandaTag3")) { jc.Call("play", "KhandaChapu3", 0, 0, a); }
+                    else { jc.Call("play", "KhandaChapu2", 0, 0, a); }
                 }
                 else if (animator.GetBool("StartMisra"))
                 {
+                    int[] a = { };
                     if (stateInfo.IsTag("MisraTag1")) {
                         //Debug.Log("Misra1 gets called");
-                        jc.Call("play", "MisraTag1");
+                        jc.Call("play", "MisraTag1", 0, 0, a);
                     }
-                    else if (stateInfo.IsTag("MisraTag2")) { jc.Call("play", "MisraTag2"); }
-                    else if (stateInfo.IsTag("MisraTag3")) { jc.Call("play", "MisraTag3"); }
-                    else { jc.Call("play", "MisraTag4");}
+                    else if (stateInfo.IsTag("MisraTag2")) { jc.Call("play", "MisraTag2", 0, 0, a); }
+                    else if (stateInfo.IsTag("MisraTag3")) { jc.Call("play", "MisraTag3", 0,0 , a); }
+                    else { jc.Call("play", "MisraTag4", 0, 0 , a);}
+                }
+                else if (animator.GetBool("StartRupakam"))
+                {
+                    int[] a = { };
+                    for (int i = 1; i <= 3; i++)
+                    {
+                        string s = i.ToString();
+                        if (stateInfo.IsTag(s)) { jc.Call("play", "Rupakam", i, 0, a); }
+                    }
+                }
+                else if (animator.GetBool("StartSankeerna"))
+                {
+                    int[] a = { };
+                    if (stateInfo.IsTag("Sankeerna1")) { jc.Call("play", "Sankeerna", 1, 0, a); }
+                    else if (stateInfo.IsTag("Sankeerna2")) { jc.Call("play", "Sankeerna", 2, 0, a); }
+                    else if (stateInfo.IsTag("Sankeerna3")) {jc.Call("play", "Sankeerna", 3, 0, a); }
+                    else if (stateInfo.IsTag("Sankeerna4")) {jc.Call("play", "Sankeerna", 4, 0, a); }
+                    else
+                    {
+                        jc.Call("play", "Sankeerna", 5, 0, a);
+                    }
+                }
+                else if (animator.GetBool("StartAdi"))
+                {
+                    if (animator.GetComponent<AnimFuncs>().canvas.GetComponent<Purchaser>().isSubscribed)
+                    {
+                        if (animator.GetComponent<AnimFuncs>().kalaiDropdown2.value == 0)
+                        {
+                            int[] a = { 1, 2, 2 };
+                            for (int i = 1; i <= 8; i++)
+                            {
+                                string s = i.ToString();
+                                if (stateInfo.IsTag(s)) { jc.Call("play", "", i, 4, a); break; }
+                            }
+                        }
+                        else
+                        {
+                            int[] a = { 1, 2, 2 };
+                            for (int i = 1; i <= 16; i++)
+                            {
+                                string s = i.ToString();
+                                if (stateInfo.IsTag(s)) { jc.Call("play", "DoubleKalai", i, 4, a); break; }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (animator.GetComponent<AnimFuncs>().kalaiDropdown.value == 0)
+                        {
+                            int[] a = { 1, 2, 2 };
+                            for (int i = 1; i <= 8; i++)
+                            {
+                                string s = i.ToString();
+                                if (stateInfo.IsTag(s)) { jc.Call("play", "", i, 4, a); break; }
+                            }
+                        }
+                        else
+                        {
+                            int[] a = { 1, 2, 2 };
+                            for (int i = 1; i <= 16; i++)
+                            {
+                                string s = i.ToString();
+                                if (stateInfo.IsTag(s)) { jc.Call("play", "DoubleKalai", i, 4, a); break; }
+                            }
+                        }
+                    }
                 }
                 else
                 {
-                    jc.Call("play", "");
+                    AnimatorControllerParameter[] param = animator.parameters;
+                    String thala = "";
+                    int jathi = 0;
+                    foreach (AnimatorControllerParameter p in param)
+                    {
+                        if (animator.GetBool(p.name))
+                        {
+                            thala = p.name.Substring(0, p.name.Length - 1);
+                            jathi = Int32.Parse(p.name.Substring(p.name.Length - 1, 1));
+                            //Debug.Log("thala: " + thala);
+                            //Debug.Log("jathi num: " + jathi);
+                        }
+                    }
+                    if (thala.Equals("Triputa"))
+                    {
+                        int[] a = { 1, 2, 2 };
+
+                        for (int i = 1; i <= 13; i++)
+                        {
+                            string s = i.ToString();
+                            if (stateInfo.IsTag(s)) { jc.Call("play", "", i, jathi, a); break; }
+                        }
+                    }
+                    else if (thala.Equals("Rupaka"))
+                    {
+                        int[] a = { 2, 1 };
+
+                        for (int i = 1; i <= 11; i++)
+                        {
+                            string s = i.ToString();
+                            if (stateInfo.IsTag(s)) { jc.Call("play", "", i, jathi, a); break; }
+                        }
+                    }
+                    else if (thala.Equals("Dhruva"))
+                    {
+                        int[] a = { 1, 2, 1, 1 };
+
+                        for (int i = 1; i <= 29; i++)
+                        {
+                            string s = i.ToString();
+                            if (stateInfo.IsTag(s)) { jc.Call("play", "", i, jathi, a); break; }
+                        }
+                    }
+                    else if (thala.Equals("Matya"))
+                    {
+                        int[] a = { 1, 2, 1 };
+
+                        for (int i = 1; i <= 20; i++)
+                        {
+                            string s = i.ToString();
+                            if (stateInfo.IsTag(s)) { jc.Call("play", "", i, jathi, a); break; }
+                        }
+                    }
+                    else if (thala.Equals("Ata"))
+                    {
+                        int[] a = { 1, 1, 2, 2 };
+
+                        for (int i = 1; i <= 22; i++)
+                        {
+                            string s = i.ToString();
+                            if (stateInfo.IsTag(s)) { jc.Call("play", "", i, jathi, a); break; }
+                        }
+                    }
+                    else if (thala.Equals("Eka"))
+                    {
+                        int[] a = { 1 };
+
+                        for (int i = 1; i <= 9; i++)
+                        {
+                            string s = i.ToString();
+                            if (stateInfo.IsTag(s)) { jc.Call("play", "", i, jathi, a); break; }
+                        }
+                    }
+                    else if (thala.Equals("Jhampa"))
+                    {
+                        int[] a = { 1, 0, 2 };
+
+                        for (int i = 1; i <= 12; i++)
+                        {
+                            string s = i.ToString();
+                            if (stateInfo.IsTag(s)) { jc.Call("play", "", i, jathi, a); break; }
+                        }
+                    }
                 }
             }
 #endif
@@ -97,21 +248,182 @@ public class PlaySound : StateMachineBehaviour
                     //Debug.Log("Sound is stopped");
                     IOSStopSound();
                 }
-                //if (animator.GetBool("StartMisra"))
+                if (animator.GetBool("StartMisra"))
+                {
+                    int[] a = { };
+                    if (stateInfo.IsTag("MisraTag1")) { IOSPlaySound(beats, "MisraTag", 0, 1,0,a, 0, 0, 0); }
+                    else if (stateInfo.IsTag("MisraTag2")) { IOSPlaySound(beats, "MisraTag", 0, 2,0, a, 0, 0, 0); }
+                    else if (stateInfo.IsTag("MisraTag3")) { IOSPlaySound(beats, "MisraTag", 0, 3,0, a, 0, 0, 0); }
+                    else { IOSPlaySound(beats, "MisraTag", 0, 4,0, a, 0, 0, 0); }
+                }
+                else if (animator.GetBool("StartKhandaChapu"))
+                {
+                    int[] a = { };
+                    if (stateInfo.IsTag("KhandaTag1")) { IOSPlaySound(beats, "KhandaTag", 1, 0, 0, a, 0, 0, 0); }
+                    else if (stateInfo.IsTag("KhandaTag2")) { IOSPlaySound(beats, "KhandaTag", 2, 0, 0, a, 0, 0, 0); }
+                    else { IOSPlaySound(beats, "KhandaTag", 3, 0,0, a, 0, 0, 0); }
+                }
+                else if (animator.GetBool("StartSankeerna"))
+                {
+                    int[] a = { };
+                    if (stateInfo.IsTag("Sankeerna1")) { IOSPlaySound(beats, "SankeernaTag", 0, 0, 1, a, 0, 0, 0); }
+                    else if (stateInfo.IsTag("Sankeerna2")) { IOSPlaySound(beats, "SankeernaTag", 0,0, 2, a, 0, 0, 0); }
+                    else if (stateInfo.IsTag("Sankeerna3")) { IOSPlaySound(beats, "SankeernaTag", 0,0, 3, a, 0, 0, 0); }
+                    else if (stateInfo.IsTag("Sankeerna4")) { IOSPlaySound(beats, "SankeernaTag", 0,0, 4, a, 0, 0, 0); }
+                    else
+                    {
+                        IOSPlaySound(beats, "SankeernaTag", 0,0, 5, a, 0, 0, 0);
+                    }
+                }
+                else if (animator.GetBool("StartRupakam"))
+                {
+                    int[] a = { };
+                    for (int i = 1; i <= 3; i++)
+                    {
+                        string s = i.ToString();
+                        if (stateInfo.IsTag(s)) { IOSPlaySound(beats, "Rupakam", 0, 0, 0, a , 0, 0, i); break; }
+                    }
+                }
+                else if (animator.GetBool("StartAdi"))
+                {
+                    if (animator.GetComponent<AnimFuncs>().canvas.GetComponent<Purchaser>().isSubscribed)
+                    {
+                        if (animator.GetComponent<AnimFuncs>().kalaiDropdown2.value == 0)
+                        {
+                            int[] a = { 1, 2, 2 };
+                            for (int i = 1; i <= 8; i++)
+                            {
+                                string s = i.ToString();
+                                if (stateInfo.IsTag(s)) { IOSPlaySound(beats, "", 0, 0, 0, a, 3, 4, i); break; }
+                            }
+                        }
+                        else
+                        {
+                            int[] a = { 1, 2, 2 };
+                            for (int i = 1; i <= 16; i++)
+                            {
+                                string s = i.ToString();
+                                if (stateInfo.IsTag(s)) { IOSPlaySound(beats, "DoubleKalai", 0, 0, 0, a, 3, 4, i); break; }
+                            }
+                        }
+                    }   
+                    else
+                    {
+                        if (animator.GetComponent<AnimFuncs>().kalaiDropdown.value == 0)
+                        {
+                            int[] a = { 1, 2, 2 };
+                            for (int i = 1; i <= 8; i++)
+                            {
+                                string s = i.ToString();
+                                if (stateInfo.IsTag(s)) { IOSPlaySound(beats, "", 0, 0, 0, a, 3, 4, i); break; }
+                            }
+                        }
+                        else
+                        {
+                            int[] a = { 1, 2, 2 };
+                            for (int i = 1; i <= 16; i++)
+                            {
+                                string s = i.ToString();
+                                if (stateInfo.IsTag(s)) { IOSPlaySound(beats, "DoubleKalai", 0, 0, 0, a, 3, 4, i); break; }
+                            }
+                        }
+                    }
+                }
+                //else if (animator.GetBool("StartAta"))
                 //{
-                //    if (stateInfo.IsTag("MisraTag1")) { IOSPlaySound(beats, "MisraTag", 0, 1); }
-                //    else if (stateInfo.IsTag("MisraTag2")) { IOSPlaySound(beats, "MisraTag", 0, 2); }
-                //    else if(stateInfo.IsTag("MisraTag3")) {IOSPlaySound(beats, "MisraTag", 0, 3); }
-                //    else { IOSPlaySound(beats, "MisraTag", 0, 4); }
+                //    int[] a = { 1, 1, 2, 2 };
+
+                //    for (int i = 1; i <= 14; i++)
+                //    {
+                //        string s = i.ToString();
+                //        if (stateInfo.IsTag(s)) { IOSPlaySound(beats, "", 0, 0, 0, a, 4, 5, i); break; }
+                //    }
                 //}
-                //else if(animator.GetBool("StartKhandaChapu"))
-                //{
-                //    if (stateInfo.IsTag("KhandaTag1")) {IOSPlaySound(beats, "KhandaTag", 1,0); }
-                //    else if(stateInfo.IsTag("KhandaTag2")) { IOSPlaySound(beats, "KhandaTag", 2,0); }
-                //    else { IOSPlaySound(beats, "KhandaTag", 3, 0); }
-                //}
-                //else { IOSPlaySound(beats, "", 0, 0);}
-                IOSPlaySound(beats, "", 0, 0);
+                else {
+                    AnimatorControllerParameter[] param = animator.parameters;
+                    String thala = "";
+                    int jathi = 0;
+                    foreach (AnimatorControllerParameter p in param)
+                    {
+                        if (animator.GetBool(p.name))
+                        {
+                            thala = p.name.Substring(0, p.name.Length - 1);
+                            jathi = Int32.Parse(p.name.Substring(p.name.Length - 1, 1));
+                            //Debug.Log("thala: " +thala);
+                            //Debug.Log("jathi num: " + jathi);
+                        }
+                    }
+                    if (thala.Equals("Triputa"))
+                    {
+                        int[] a = { 1, 2, 2 };
+
+                        for (int i = 1; i <= 13; i++)
+                        {
+                            string s = i.ToString();
+                            if (stateInfo.IsTag(s)) { IOSPlaySound(beats, "", 0, 0, 0, a, 3, jathi, i); break; }
+                        }
+                    }
+                    else if (thala.Equals("Rupaka"))
+                    {
+                        int[] a = { 2, 1 };
+
+                        for (int i = 1; i <= 11; i++)
+                        {
+                            string s = i.ToString();
+                            if (stateInfo.IsTag(s)) { IOSPlaySound(beats, "", 0, 0, 0, a, 2, jathi, i); break;}
+                        }
+                    }
+                    else if (thala.Equals("Dhruva"))
+                    {
+                        int[] a = { 1,2, 1,1 };
+
+                        for (int i = 1; i <= 29; i++)
+                        {
+                            string s = i.ToString();
+                            if (stateInfo.IsTag(s)) { IOSPlaySound(beats, "", 0, 0, 0, a, 4, jathi, i); break; }
+                        }
+                    }
+                    else if (thala.Equals("Matya"))
+                    {
+                        int[] a = { 1, 2, 1};
+
+                        for (int i = 1; i <= 20; i++)
+                        {
+                            string s = i.ToString();
+                            if (stateInfo.IsTag(s)) { IOSPlaySound(beats, "", 0, 0, 0, a, 3, jathi, i);break; }
+                        }
+                    }
+                    else if (thala.Equals("Ata"))
+                    {
+                        int[] a = { 1, 1, 2, 2 };
+
+                        for (int i = 1; i <= 22; i++)
+                        {
+                            string s = i.ToString();
+                            if (stateInfo.IsTag(s)) { IOSPlaySound(beats, "", 0, 0, 0, a, 4, jathi, i); break; }
+                        }
+                    }
+                    else if (thala.Equals("Eka"))
+                    {
+                        int[] a = { 1};
+
+                        for (int i = 1; i <= 9; i++)
+                        {
+                            string s = i.ToString();
+                            if (stateInfo.IsTag(s)) { IOSPlaySound(beats, "", 0, 0, 0, a, 1, jathi, i); break; }
+                        }
+                    }
+                    else if (thala.Equals("Jhampa"))
+                    {
+                        int[] a = { 1, 0, 2 };
+
+                        for (int i = 1; i <= 12; i++)
+                        {
+                            string s = i.ToString();
+                            if (stateInfo.IsTag(s)) { IOSPlaySound(beats, "", 0, 0, 0, a, 3, jathi, i); break; }
+                        }
+                    }
+                }
             }
 #endif
 

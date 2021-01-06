@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class SetUpScene : MonoBehaviour
 {
-    public TMP_InputField inputField;
-    public TMP_InputField inputField2;
+    public InputField inputField;
+    public InputField inputField2;
     public Canvas canvas;
     //set up controls 
     void Start()

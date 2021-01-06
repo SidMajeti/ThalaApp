@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class InputFieldScript : MonoBehaviour
 {
@@ -14,7 +15,7 @@ public class InputFieldScript : MonoBehaviour
     private static extern void IOSStopSound();
 #endif
 
-    public TMP_InputField inputField;
+    public InputField inputField;
     public GameObject handAnim;
     Animator m_Animator;
 
@@ -22,7 +23,7 @@ public class InputFieldScript : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        inputField = inputField.GetComponent<TMP_InputField>();
+        inputField = inputField.GetComponent<InputField>();
         m_Animator = handAnim.GetComponent<Animator>();
         inputField.onEndEdit.AddListener(ChangeSpeed);
         inputField.text = Convert.ToString((int)(1 / 0.8 * m_Animator.speed * 60.0f));
