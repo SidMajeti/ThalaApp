@@ -176,7 +176,7 @@ PlayerSettings:
     iPhone: com.sidmajeti.thala
   buildNumber:
     iPhone: 3
-  AndroidBundleVersionCode: 22
+  AndroidBundleVersionCode: 26
   AndroidMinSdkVersion: 21
   AndroidTargetSdkVersion: 0
   AndroidPreferredInstallLocation: 1

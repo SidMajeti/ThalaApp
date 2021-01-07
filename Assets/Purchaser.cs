@@ -121,32 +121,32 @@ public class Purchaser : MonoBehaviour, IStoreListener
                     if (item.definition.type == ProductType.Subscription)
                     {
 #if UNITY_ANDROID
-                        if (checkIfProductIsAvailableForSubscriptionManager(item.receipt))
+                        
+                        //Debug.Log("Entered isInitialized");
+                        //Debug.Log("Entered isInitialized");
+                        string intro_json = (introductory_info_dict == null || !introductory_info_dict.ContainsKey(item.definition.storeSpecificId)) ? null : introductory_info_dict[item.definition.storeSpecificId];
+                        SubscriptionManager p = new SubscriptionManager(item, intro_json);
+                        SubscriptionInfo info = p.getSubscriptionInfo();
+                                                    if (info.isSubscribed().ToString().Equals("True"))
                         {
-                            //Debug.Log("Entered isInitialized");
-                            string intro_json = (introductory_info_dict == null || !introductory_info_dict.ContainsKey(item.definition.storeSpecificId)) ? null : introductory_info_dict[item.definition.storeSpecificId];
-                            SubscriptionManager p = new SubscriptionManager(item, intro_json);
-                            SubscriptionInfo info = p.getSubscriptionInfo();
-                            if (info.isSubscribed().ToString().Equals("True"))
+                            // set timestamp each time user is subscribed and you have reinitialized/requeried
+                            //Debug.Log("User is subscribed");
+                            tstamp = System.DateTime.Now.ToOADate();
+
+                            if (subsButton.gameObject.activeSelf)
                             {
-                                // set timestamp each time user is subscribed and you have reinitialized/requeried
-                                tstamp = System.DateTime.Now.ToOADate();
+                                subsButton.gameObject.SetActive(false);
+                                panel.gameObject.SetActive(false);
+                            }
+                            isSubscribed = true;
+                            //allow user to access full app
+                            fullSettingsPanel.SetActive(true);
+                            settingsPanel.SetActive(false);
 
-                                if (subsButton.gameObject.activeSelf)
-                                {
-                                    subsButton.gameObject.SetActive(false);
-                                    panel.gameObject.SetActive(false);
-                                }
-                                isSubscribed = true;
-                                //allow user to access full app
-                                fullSettingsPanel.SetActive(true);
-                                settingsPanel.SetActive(false);
-
-                                if (smallSettings.GetBool("isOpen"))
-                                {
-                                    fullSettings.SetBool("isOpen", true);
-                                    smallSettings.SetBool("isOpen", false);
-                                }
+                            if (smallSettings.GetBool("isOpen"))
+                            {
+                                fullSettings.SetBool("isOpen", true);
+                                smallSettings.SetBool("isOpen", false);
                             }
                         }
                         else
@@ -394,6 +394,7 @@ public class Purchaser : MonoBehaviour, IStoreListener
         loadCircle = false;
         if (String.Equals(args.purchasedProduct.definition.id, kProductIDSubscription, StringComparison.Ordinal))
         {
+            //Debug.Log("EnteredProcessPurchase");
             smallSettings.SetBool("isOpen", false);
             playPanel.gameObject.SetActive(true);
             if (subsButton.gameObject.activeSelf)
