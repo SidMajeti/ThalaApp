@@ -22,7 +22,8 @@ public class PanelController : MonoBehaviour
     public int current = 0;
     void Awake()
     {
-        fullSettingsPanel.SetActive(false);
+        //fullSettingsPanel.SetActive(false);
+        settingsPanel.SetActive(false);
         settings = settings.GetComponent<Button>();
         settings.onClick.AddListener(OpenSettingsPanel);
         backToPlay = backToPlay.GetComponent<Button>();

@@ -124,7 +124,10 @@ public class AnimFuncs : MonoBehaviour
             saptaAnimator.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("HandController");
         }
 
-        bool isSubscribed = canvas.GetComponent<Purchaser>().isSubscribed;
+        //bool isSubscribed = canvas.GetComponent<Purchaser>().isSubscribed;
+
+        //temp for no subscription button
+        bool isSubscribed = true;
 
         if (isSubscribed)
         {
@@ -204,7 +207,10 @@ public class AnimFuncs : MonoBehaviour
             //float currentTime = Time.time * 1000;
             //Debug.Log("Time when play is pressed : " +currentTime);
 
-            bool isSubscribed = canvas.GetComponent<Purchaser>().isSubscribed;
+            //bool isSubscribed = canvas.GetComponent<Purchaser>().isSubscribed;
+
+            //temp for no subs button
+            bool isSubscribed = true;
 
             if (isSubscribed)
             {

@@ -44,7 +44,10 @@ public class PlaySound : StateMachineBehaviour
         //Debug.Log(currentTime - pastTime);
         //animator.GetComponent<GetTime>().setTime(currentTime);
         isMuted = animator.GetComponent<SoundFuncs>().mute;
-        bool isSubscribed = animator.GetComponent<AnimFuncs>().canvas.GetComponent<Purchaser>().isSubscribed;
+        //bool isSubscribed = animator.GetComponent<AnimFuncs>().canvas.GetComponent<Purchaser>().isSubscribed;
+
+        //temp for when we don't have a subs button(ie no subscription)
+        bool isSubscribed = true;
         if (isSubscribed)
         {
             inputField = animator.GetComponent<SetUpScene>().inputField2;
@@ -106,7 +109,8 @@ public class PlaySound : StateMachineBehaviour
                 }
                 else if (animator.GetBool("StartAdi"))
                 {
-                    if (animator.GetComponent<AnimFuncs>().canvas.GetComponent<Purchaser>().isSubscribed)
+                    //if (animator.GetComponent<AnimFuncs>().canvas.GetComponent<Purchaser>().isSubscribed)
+                    if(true)
                     {
                         if (animator.GetComponent<AnimFuncs>().kalaiDropdown2.value == 0)
                         {
@@ -286,7 +290,10 @@ public class PlaySound : StateMachineBehaviour
                 }
                 else if (animator.GetBool("StartAdi"))
                 {
-                    if (animator.GetComponent<AnimFuncs>().canvas.GetComponent<Purchaser>().isSubscribed)
+                    //if (animator.GetComponent<AnimFuncs>().canvas.GetComponent<Purchaser>().isSubscribed)
+
+                    //temp for when no subscription
+                    if(true)
                     {
                         if (animator.GetComponent<AnimFuncs>().kalaiDropdown2.value == 0)
                         {
